@@ -1,6 +1,7 @@
 # 生日与保费提醒 App：代理使用说明 / Birthday & Premium Reminder: guide for agents
 
-**链接 Link:** https://claude.ai/artifact/FUjRb221CMVvRjmKczVqAN
+**链接 Link:** https://kkingtan-cpu.github.io/birthday-premium-reminder/
+（不用登入，用手机直接打开。No sign-in needed; open it on your phone.）
 
 ## 每周一 Every Monday
 1. 从代理系统下载您的 **Policy Listing**，存成 PDF（所有页）。
