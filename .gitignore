@@ -1,0 +1,9 @@
+# Real customer data must never be uploaded
+test-run/
+*.pdf
+*.xlsx
+*.xls
+*.csv
+
+# Full private project notes (personal details)
+PROJECT-NOTES-PRIVATE.md
