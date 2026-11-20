@@ -19,6 +19,11 @@
 在 **Settings** 里确认署名（会自动用 PDF 里的 Agent Name），并选择消息语言和生日卡风格。
 In **Settings**, check your sign-off name (filled in from the Agent Name in your PDF), and pick the message language and card style.
 
+## 记住名单 Your list is remembered
+载入一次后，名单会保存在您的手机里，下次打开 App 会自动出现。每个星期一载入最新的 PDF，就会换成新名单。不想保存的话，按 **清除保存的名单**，或在 Settings 关掉 **记住我的名单**。
+After you load it once, your list is saved on your phone and appears automatically next time. Load the latest PDF every Monday to replace it. To remove it, tap **Clear saved list**, or turn off **Remember my list** in Settings.
+（用浏览器的无痕/隐私模式时不会保存。Private/incognito browsing does not save it.）
+
 ## 隐私 Privacy
 - 您的客户资料只在您自己的手机里处理，不会上传，别人也看不到。
   Your customer data is processed only on your own phone. It isn't uploaded, and nobody else can see it.

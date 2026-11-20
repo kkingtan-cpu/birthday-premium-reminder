@@ -155,7 +155,7 @@ details[open]>summary::before{transform:rotate(45deg)}
       <h2>1 · Load this week's list</h2>
       <button class="ghost small" id="btnTemplates">Get blank templates</button>
     </div>
-    <p class="muted small">Your files are read only inside this page on your device. Nothing is uploaded or saved. A policy listing PDF covers both boxes: load all its pages together.</p>
+    <p class="muted small">Your files are read only on this device and nothing is uploaded. Your list is remembered on this phone until you clear it, so next time it opens ready. A policy listing PDF covers both boxes: load all its pages together.</p>
     <div class="drops">
       <div class="drop" id="dropCust">
         <h3>Customer or policy list</h3>
@@ -178,6 +178,10 @@ details[open]>summary::before{transform:rotate(45deg)}
         <input type="file" id="inPrem" multiple accept=".xlsx,.xls,.csv,.pdf,.png,.jpg,.jpeg,image/*">
       </div>
     </div>
+    <div class="row small" id="savedRow" hidden style="justify-content:space-between;background:var(--ok-soft);border-radius:10px;padding:8px 12px">
+      <span id="savedInfo"></span>
+      <button class="ghost" id="forgetList">清除保存的名单 Clear saved list</button>
+    </div>
     <details id="settingsBox">
       <summary>Settings</summary>
       <div class="fields" style="margin-top:12px">
@@ -199,6 +203,7 @@ details[open]>summary::before{transform:rotate(45deg)}
           <input type="text" id="setSign" placeholder="Your name"></label>
         <label for="setOrg">Your company (optional, in messages)
           <input type="text" id="setOrg" placeholder="e.g. your agency name"></label>
+        <label class="check" for="setRemember"><input type="checkbox" id="setRemember"> 记住我的名单在这部手机 Remember my list on this phone</label>
         <label class="check" for="setTidy"><input type="checkbox" id="setTidy"> Write CAPITAL names as Lim Mei Ling in messages</label>
       </div>
     </details>
@@ -258,7 +263,8 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = {
   get(k, d){ try{ const v = localStorage.getItem("bpr."+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
-  set(k, v){ try{ localStorage.setItem("bpr."+k, JSON.stringify(v)); }catch(e){} }
+  set(k, v){ try{ localStorage.setItem("bpr."+k, JSON.stringify(v)); return true; }catch(e){ return false; } },
+  del(k){ try{ localStorage.removeItem("bpr."+k); }catch(e){} }
 };
 const MON_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const DAY_EN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -295,7 +301,8 @@ const S = {
   week: {bday:[], due:[], over:[]},
   tab: "bday", demo: false, shown: 40,
   edits: {}, cardLang: {}, sent: store.get("sent", {}), phones: store.get("phones", {}),
-  cardStyle: store.get("cardStyle", "gold"), cardStyleFor: {}
+  cardStyle: store.get("cardStyle", "gold"), cardStyleFor: {},
+  remember: store.get("remember", true), savedAt: null
 };
 
 /* ---------- column detection ---------- */
@@ -857,6 +864,11 @@ function render(){
     b.textContent = {bday:"Birthdays",due:"Premiums due",over:"Overdue",check:"Rows to check"}[b.dataset.tab] + " (" + n + ")";
   });
   const asAt = S.meta.asAt ? ` · listing as at ${S.meta.asAt}` : "";
+  $("#savedRow").hidden = !S.savedAt;
+  if (S.savedAt) {
+    const sd = new Date(S.savedAt), age = diffDays(new Date(sd.getFullYear(), sd.getMonth(), sd.getDate()), todayLocal());
+    $("#savedInfo").textContent = `✓ 已保存在这部手机 Saved on this phone · ${fmtEN(sd)}` + (age > 7 ? ` · 名单已超过 7 天，请载入最新的 PDF (list is ${age} days old, load the latest PDF)` : "");
+  }
   if (S.combined && S.cust) {
     $("#fileCust").textContent = `${S.cust.source} · ${plural(S.cust.body.length, "policy", "policies")} · ${plural(S.customers.length, "customer")}${asAt}`;
     $("#filePrem").textContent = "Premiums taken from the policy list.";
@@ -1340,11 +1352,46 @@ function useTable(T, slot, meta){
   S.meta = Object.assign({}, meta);
   if (meta.agent && !S.sign) { S.sign = titleCase(meta.agent); store.set("sign", S.sign); syncSettings(); }
   S.edits = {}; S.shown = 40; imgCache.clear();
-  processAll();
-  if (T.how !== "excel") S.issues.unshift({level: "warn", where: T.source, who: "", text: `Read from ${T.how === "pdf" ? "a PDF" : "pasted text"}. Spot-check a few names, dates and amounts against the original before sending.`});
+  processAll(); readNote(); saveList();
   pickDefaultTab(); render();
   toast(combined ? `${plural(T.body.length, "policy", "policies")} loaded for ${plural(S.customers.length, "customer")}.` : slot === "cust" ? `${plural(S.customers.length, "customer")} loaded.` : `${plural(S.premiums.length, "unpaid premium")} loaded.`);
 }
+function readNote(){
+  const T = S.cust || S.prem;
+  if (T && T.how !== "excel") S.issues.unshift({level: "warn", where: T.source, who: "", text: `Read from ${T.how === "pdf" ? "a PDF" : "pasted text"}. Spot-check a few names, dates and amounts against the original before sending.`});
+}
+/* Remember the loaded list on this device only (browser storage), so it is ready next time */
+const pack = T => T ? {header: T.header, body: T.body, source: T.source, how: T.how, map: T.map} : null;
+function saveList(){
+  if (!S.remember || S.demo || (!S.cust && !S.prem)) return;
+  const now = new Date().toISOString();
+  const ok = store.set("list", {v: 1, savedAt: now, combined: S.combined, meta: S.meta, cust: pack(S.cust),
+    prem: S.combined ? null : pack(S.prem), premMap: S.combined && S.prem ? S.prem.map : null});
+  S.savedAt = ok ? now : null;
+  if (!ok) toast("This phone couldn't save the list (private browsing or storage full). It will be gone when you close the page.");
+}
+function restoreList(){
+  const L = store.get("list", null);
+  if (!S.remember || !L || (!L.cust && !L.prem)) return false;
+  S.cust = L.cust ? Object.assign({}, L.cust) : null;
+  S.prem = L.combined ? Object.assign({}, L.cust, {map: L.premMap || {}}) : (L.prem ? Object.assign({}, L.prem) : null);
+  S.combined = !!L.combined; S.meta = L.meta || {}; S.demo = false; S.savedAt = L.savedAt;
+  processAll(); readNote(); pickDefaultTab();
+  return true;
+}
+function forgetList(after){
+  sheet(`<h2>清除保存的名单？ Clear the saved list?</h2>
+    <p>这会删除保存在这部手机里的客户名单，下次打开要重新载入 PDF。您的 PDF 文件本身不受影响。</p>
+    <p class="small muted">This deletes the customer list saved on this phone. Next time you'll need to load the PDF again. Your PDF files are not affected.</p>
+    <div class="row" style="justify-content:flex-end"><button data-close id="keepList">取消 Cancel</button><button class="primary" id="doForget">清除 Clear</button></div>`, (el, close) => {
+    el.querySelector("#doForget").addEventListener("click", () => {
+      store.del("list"); S.savedAt = null; S.cust = null; S.prem = null; S.combined = false; S.meta = {};
+      close(); processAll(); render(); after && after(true); toast("已清除 Saved list cleared.");
+    });
+    el.querySelector("#keepList").addEventListener("click", () => after && after(false));
+  });
+}
+$("#forgetList").addEventListener("click", () => forgetList());
 function bindDrop(zone, input, slot){
   input.addEventListener("change", () => { if (input.files.length) readFiles([...input.files], slot); input.value = ""; });
   zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("over"); });
@@ -1373,7 +1420,7 @@ $("#mapArea").addEventListener("change", e => {
   const T = s.dataset.kind === "cust" ? S.cust : S.prem; const v = s.value === "" ? null : +s.value;
   for (const f in T.map) if (T.map[f] === v && f !== s.dataset.field && v != null) delete T.map[f];
   if (v == null) delete T.map[s.dataset.field]; else T.map[s.dataset.field] = v;
-  processAll(); render(); $("#mapBox").open = true;
+  processAll(); readNote(); saveList(); render(); $("#mapBox").open = true;
 });
 
 /* ---------- templates ---------- */
@@ -1389,7 +1436,7 @@ $("#btnTemplates").addEventListener("click", () => {
 
 /* ---------- settings ---------- */
 function syncSettings(){
-  $("#setRun").value = iso(S.run); $("#setLead").value = S.lead; $("#setWin").value = S.win; $("#setTidy").checked = !!S.tidy; $("#setOver").value = S.overMax; $("#setStyle").value = S.cardStyle;
+  $("#setRun").value = iso(S.run); $("#setLead").value = S.lead; $("#setWin").value = S.win; $("#setTidy").checked = !!S.tidy; $("#setOver").value = S.overMax; $("#setStyle").value = S.cardStyle; $("#setRemember").checked = !!S.remember;
   $("#setOrder").value = S.order; $("#setLang").value = S.lang; $("#setOrg").value = S.org; $("#setSign").value = S.sign;
 }
 $("#settingsBox").addEventListener("change", e => {
@@ -1404,6 +1451,12 @@ $("#settingsBox").addEventListener("change", e => {
   if (id === "setTidy") S.tidy = e.target.checked;
   if (id === "setOver") S.overMax = Math.max(1, Math.min(3650, +e.target.value || 90));
   if (id === "setStyle") { S.cardStyle = e.target.value; S.cardStyleFor = {}; }
+  if (id === "setRemember") {
+    if (e.target.checked) { S.remember = true; store.set("remember", true); saveList(); render(); }
+    else if (!store.get("list", null)) { S.remember = false; store.set("remember", false); }
+    else { e.target.checked = true; forgetList(done => { if (done) { S.remember = false; store.set("remember", false); syncSettings(); } }); }
+    return;
+  }
   ["lead","win","order","lang","org","sign","tidy","overMax","cardStyle"].forEach(k => store.set(k, S[k]));
   imgCache.clear(); processAll(); render();
 });
@@ -1449,7 +1502,7 @@ $("#clearDemo").addEventListener("click", () => {
 });
 
 /* ---------- start ---------- */
-syncSettings(); loadDemo(); render();
+syncSettings(); if (!restoreList()) loadDemo(); render();
 window.__app = {S, cardURL, loadDemo, processAll, render, buildPdf, previewPdf, parseDate, parsePhone, readFiles, pdfRead, useTable, tableFrom};
 })();
 </script>
