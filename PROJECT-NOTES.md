@@ -55,3 +55,4 @@ This file is the project's memory: what was built, why, and what was decided. Ad
 - 2026-11-21: Branded QR code (share/qr-designed.png; share/qr-code.png now has the icon in the centre). Verified to decode.
 - 2026-11-21: Upload box explains where to get the list: download all policies from Online Inquiry as PDF.
 - 2026-11-21: One upload box (Customer & policy list) instead of two; separate customer/premium spreadsheets are told apart automatically.
+- 2026-11-21: Android APK 1.0 (io.github.kkingtancpu.reminder, Android 7.0+), a Trusted Web Activity built with Bubblewrap and published as a GitHub release. The site root kkingtan-cpu.github.io hosts .well-known/assetlinks.json. The signing key is kept offline, not in this repository.

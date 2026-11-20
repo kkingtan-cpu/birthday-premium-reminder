@@ -7,3 +7,11 @@ test-run/
 
 # Full private project notes (personal details)
 PROJECT-NOTES-PRIVATE.md
+
+# Android signing key and build folder (never upload)
+android-private/
+android-build/
+*.keystore
+*.jks
+*.apk
+*.aab

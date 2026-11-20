@@ -8,6 +8,9 @@
   Open the link in Safari → Share ⬆ → **Add to Home Screen** → Add.
 - **Android：** 用 Chrome 打开链接 → 按 ⋮ → **安装应用 / 添加到主屏幕** → 安装。（也可以按 App 里的 **📲 安装到手机**。）
   Open the link in Chrome → ⋮ → **Install app / Add to Home screen** → Install. (Or tap **📲 Install app** in the app.)
+- **Android APK（直接下载 download）：** https://github.com/kkingtan-cpu/birthday-premium-reminder/releases/latest/download/birthday-premium-reminder.apk
+  打开下载的文件 → 允许"安装未知应用" → 安装（如出现 Play Protect 提示，按"更多详情 → 仍然安装"）。
+  Open the file → allow "install unknown apps" → Install (if Play Protect warns: "More details → Install anyway").
 - 之后在主屏幕点 **生日保费提醒** 图标就能打开。第一次从图标打开时，请再载入一次 PDF。
   Then open it from the **生日保费提醒** icon on your home screen. The first time, load your PDF once more.
 
