@@ -12,8 +12,8 @@
   Then open it from the **生日保费提醒** icon on your home screen. The first time, load your PDF once more.
 
 ## 每周一 Every Monday
-1. 从代理系统下载您的 **Policy Listing**，存成 PDF（所有页）。
-   Download your **Policy Listing** from the agent portal as PDF (all pages).
+1. 到 **Online Inquiry** 下载您所有保单的资料，存成 PDF（所有页）。
+   Download all your policy data from **Online Inquiry** and save it as PDF (all pages).
 2. 用手机打开上面的链接，在第 1 步 **Choose files**，选全部 PDF 文件。
    Open the link on your phone. In step 1, tap **Choose files** and pick all the PDF files.
 3. 第 2 步：看看有没有标着 "Left out" 的资料。

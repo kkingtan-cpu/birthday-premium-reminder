@@ -15,7 +15,7 @@ https://kkingtan-cpu.github.io/birthday-premium-reminder/
 
 ━━━━━━━━━━━━
 🗓️ *每个星期一这样用：*
-1️⃣ 从代理系统下载您的 *Policy Listing*，存成 PDF（*所有页*）
+1️⃣ 到 *Online Inquiry* 下载您所有保单的资料，存成 PDF（*所有页*）
 2️⃣ 打开 App，按 *Choose files*，一次选全部 PDF
 3️⃣ 看三个分页：🎂 生日｜💰 到期保费｜⚠️ 逾期保费
 4️⃣ 按 *WhatsApp…* 发送
