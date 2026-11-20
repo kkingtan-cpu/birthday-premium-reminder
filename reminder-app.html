@@ -136,6 +136,7 @@ details[open]>summary::before{transform:rotate(45deg)}
     <span class="eyebrow">Weekly reminder · English &amp; 中文</span>
     <h1>Birthday &amp; Premium Reminder</h1>
     <p class="muted week" id="weekLine"></p>
+    <button class="ghost small" id="btnInstall" hidden style="align-self:flex-start">📲 安装到手机 Install app</button>
   </header>
 
   <div class="banner demo" id="demoBanner" hidden>
@@ -1499,6 +1500,28 @@ function loadDemo(){
 }
 $("#clearDemo").addEventListener("click", () => {
   S.demo = false; S.cust = null; S.prem = null; S.combined = false; S.sent = store.get("sent", {}); processAll(); render();
+});
+
+/* ---------- install on the phone's home screen ---------- */
+let installPrompt = null;
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+let inFrame = true; try { inFrame = window.self !== window.top; } catch (e) {}
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; if (!standalone) $("#btnInstall").hidden = false; });
+if (!standalone && !inFrame && (isIOS || /android/i.test(navigator.userAgent))) $("#btnInstall").hidden = false;
+$("#btnInstall").addEventListener("click", async () => {
+  if (installPrompt) {
+    installPrompt.prompt();
+    try { const r = await installPrompt.userChoice; if (r.outcome === "accepted") { $("#btnInstall").hidden = true; toast("已安装 Installed. 在主屏幕找 生日保费提醒 图标。"); } } catch (e) {}
+    installPrompt = null; return;
+  }
+  sheet(`<h2>📲 安装到手机 Install on your phone</h2>
+    <div class="msg"><span class="lang">iPhone / iPad（用 Safari 打开 Open in Safari）</span>
+    <p>1. 按底部的 <b>分享</b> 按钮（方框加向上箭头 ⬆）<br>2. 往下滑，按 <b>添加到主屏幕 Add to Home Screen</b><br>3. 按右上角 <b>添加 Add</b></p></div>
+    <div class="msg"><span class="lang">Android（用 Chrome 打开 Open in Chrome）</span>
+    <p>1. 按右上角 <b>⋮</b><br>2. 按 <b>安装应用 Install app</b> 或 <b>添加到主屏幕 Add to Home screen</b><br>3. 按 <b>安装 Install</b></p></div>
+    <p class="small muted">之后在主屏幕点 <b>生日保费提醒</b> 图标打开。第一次从图标打开时，请再载入一次 PDF：iPhone 的图标 App 和 Safari 分开保存名单。<br>Then open it from the home-screen icon. On iPhone, load your PDF once more from the icon, because the icon app keeps its own saved list.</p>
+    <div class="row" style="justify-content:flex-end"><button class="primary" data-close>好的 OK</button></div>`);
 });
 
 /* ---------- start ---------- */

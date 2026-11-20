@@ -3,6 +3,14 @@
 **链接 Link:** https://kkingtan-cpu.github.io/birthday-premium-reminder/
 （不用登入，用手机直接打开。No sign-in needed; open it on your phone.）
 
+## 安装到手机 Install on your phone（只需一次 once）
+- **iPhone：** 用 Safari 打开链接 → 按 分享 ⬆ → **添加到主屏幕** → 添加。
+  Open the link in Safari → Share ⬆ → **Add to Home Screen** → Add.
+- **Android：** 用 Chrome 打开链接 → 按 ⋮ → **安装应用 / 添加到主屏幕** → 安装。（也可以按 App 里的 **📲 安装到手机**。）
+  Open the link in Chrome → ⋮ → **Install app / Add to Home screen** → Install. (Or tap **📲 Install app** in the app.)
+- 之后在主屏幕点 **生日保费提醒** 图标就能打开。第一次从图标打开时，请再载入一次 PDF。
+  Then open it from the **生日保费提醒** icon on your home screen. The first time, load your PDF once more.
+
 ## 每周一 Every Monday
 1. 从代理系统下载您的 **Policy Listing**，存成 PDF（所有页）。
    Download your **Policy Listing** from the agent portal as PDF (all pages).
