@@ -48,3 +48,4 @@ This file is the project's memory: what was built, why, and what was decided. Ad
 - 2026-11-20: The birthday card is sent together with the greeting.
 - 2026-11-20: Shared with agents; guide for agents added; moved to GitHub.
 - 2026-11-20: Personal details removed; repository made public.
+- 2026-11-21: Web page for the team on GitHub Pages (index.html, built from reminder-app.html by build-index.ps1).

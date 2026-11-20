@@ -1,0 +1,1458 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Birthday &amp; Premium Reminder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Great+Vibes&family=Cormorant+Garamond:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap&text=%E7%94%9F%E6%97%A5%E5%BF%AB%E4%B9%90%E7%A6%8F%E5%AF%BF%E8%BA%AB%E4%BD%93%E5%81%A5%E5%BA%B7%E4%B8%87%E4%BA%8B%E5%A6%82%E6%84%8F%E4%B8%9C%E6%B5%B7%E6%AF%94%E5%8D%97%E5%B1%B1%C2%B7">
+<style>
+/* Layout: one phone-first column, max 780px. Summary strip, then load → check → send. */
+:root{
+  --bg:#F2F3F8; --surface:#FFFFFF; --sunk:#E9EBF3; --ink:#1A2042; --muted:#5B6185; --line:#D9DCE8;
+  --brand:#28317C; --brand-ink:#FFFFFF; --brand-soft:#E4E6F7;
+  --gold:#B97C12; --gold-soft:#FBF0D9;
+  --ok:#1D7A4D; --ok-soft:#DFF2E7; --warn:#9A5600; --warn-soft:#FCEED8; --bad:#B3261E; --bad-soft:#FBE4E2;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1220; --surface:#181C2E; --sunk:#12162A; --ink:#E8EAF6; --muted:#A0A6C4; --line:#2B3050;
+  --brand:#9AA5FF; --brand-ink:#0F1220; --brand-soft:#232A55;
+  --gold:#EDB653; --gold-soft:#3A2D12;
+  --ok:#62CF95; --ok-soft:#14301F; --warn:#F2AC4E; --warn-soft:#37260E; --bad:#FF8A80; --bad-soft:#3A1715;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1220; --surface:#181C2E; --sunk:#12162A; --ink:#E8EAF6; --muted:#A0A6C4; --line:#2B3050;
+  --brand:#9AA5FF; --brand-ink:#0F1220; --brand-soft:#232A55;
+  --gold:#EDB653; --gold-soft:#3A2D12;
+  --ok:#62CF95; --ok-soft:#14301F; --warn:#F2AC4E; --warn-soft:#37260E; --bad:#FF8A80; --bad-soft:#3A1715;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+.wrap{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(26px,6vw,34px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:20px;font-weight:600}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+button,.btn{font:inherit;font-weight:600;font-size:14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;min-height:40px;justify-content:center}
+button:hover,.btn:hover{border-color:var(--brand)}
+button:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+button.primary,.btn.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+button.ghost{background:transparent}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+
+.top{display:flex;flex-direction:column;gap:6px}
+.week{font-variant-numeric:tabular-nums}
+.banner{border-radius:10px;padding:10px 14px;font-size:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.banner.demo{background:var(--gold-soft);color:var(--ink);border:1px dashed var(--gold)}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;text-align:left;display:flex;flex-direction:column;gap:2px;align-items:flex-start;min-height:0}
+.stat b{font-family:var(--display);font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted);font-weight:500}
+.stat[aria-pressed="true"]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.stat.s-bday b{color:var(--gold)}
+.stat.s-due b{color:var(--brand)}
+.stat.s-over b{color:var(--bad)}
+.stat.s-check b{color:var(--warn)}
+
+.drops{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:600px){.drops{grid-template-columns:1fr}}
+.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--sunk);min-width:0}
+.drop.over{border-color:var(--brand);background:var(--brand-soft)}
+.drop .file{font-size:13px;font-weight:600;word-break:break-word}
+.drop input[type=file]{display:none}
+textarea,select,input[type=text],input[type=date],input[type=number]{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:40px;max-width:100%}
+textarea{width:100%;resize:vertical;line-height:1.5}
+details>summary{cursor:pointer;font-weight:600;list-style:none;display:flex;align-items:center;gap:8px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s;flex:none}
+details[open]>summary::before{transform:rotate(45deg)}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.fields label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:600;min-width:0}
+.fields label.check{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+.fields select,.fields input[type=text],.fields input[type=date],.fields input[type=number]{width:100%}
+
+.issues{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow:auto}
+.issue{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:8px 10px;border-radius:8px;background:var(--sunk);font-size:14px;align-items:start}
+.issue .lvl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-top:2px}
+.lvl.error{background:var(--bad-soft);color:var(--bad)}
+.lvl.warn{background:var(--warn-soft);color:var(--warn)}
+.lvl.info{background:var(--brand-soft);color:var(--brand)}
+
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.tabs button{white-space:nowrap;border-radius:999px;min-height:36px;padding:6px 14px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.done{opacity:.6}
+.card-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.who{min-width:0}
+.who h3{word-break:break-word}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted)}
+.meta span{word-break:break-word}
+.pols{font-size:13px;display:flex;flex-direction:column;gap:2px;font-variant-numeric:tabular-nums}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.p-bday{background:var(--gold-soft);color:var(--gold)}
+.p-due{background:var(--brand-soft);color:var(--brand)}
+.p-over{background:var(--bad-soft);color:var(--bad)}
+.p-today{background:var(--ok-soft);color:var(--ok)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.flag{font-size:13px;background:var(--warn-soft);color:var(--ink);border-radius:8px;padding:8px 10px}
+.cardimg{width:100%;max-width:420px;aspect-ratio:16/9;border-radius:10px;display:block}
+.msg{display:flex;flex-direction:column;gap:6px}
+.msg .lang{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;border-radius:0;min-height:34px;padding:4px 12px;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+.empty{padding:26px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+.more{align-self:center}
+
+.scrim{position:fixed;inset:0;background:rgba(10,12,25,.55);display:flex;align-items:flex-end;justify-content:center;z-index:50;
+  padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+@media (min-width:640px){.scrim{align-items:center}}
+.sheet{background:var(--surface);color:var(--ink);border-radius:16px;padding:20px;width:100%;max-width:560px;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.sheet>*{flex-shrink:0}
+.sheet pre{white-space:pre-wrap;word-break:break-word;background:var(--sunk);padding:12px;border-radius:10px;font:inherit;font-size:14px;margin:0;max-height:40vh;overflow:auto}
+.pdfpages{display:flex;flex-direction:column;gap:10px}
+.pdfpages canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:6px;background:#fff}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:60;max-width:calc(100% - 32px)}
+.guide ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Weekly reminder · English &amp; 中文</span>
+    <h1>Birthday &amp; Premium Reminder</h1>
+    <p class="muted week" id="weekLine"></p>
+  </header>
+
+  <div class="banner demo" id="demoBanner" hidden>
+    <span><b>Example data.</b> These customers are made up so you can see how it works. Load your own list below.</span>
+    <button class="ghost" id="clearDemo">Clear example</button>
+  </div>
+
+  <section class="stats" aria-label="This week">
+    <button class="stat s-bday" data-tab="bday"><b id="nBday">0</b><span>Birthdays</span></button>
+    <button class="stat s-due" data-tab="due"><b id="nDue">0</b><span>Premiums due soon</span></button>
+    <button class="stat s-over" data-tab="over"><b id="nOver">0</b><span>Overdue premiums</span></button>
+    <button class="stat s-check" data-tab="check"><b id="nCheck">0</b><span>Rows to check</span></button>
+  </section>
+
+  <section class="panel" id="loadPanel">
+    <div class="row" style="justify-content:space-between">
+      <h2>1 · Load this week's list</h2>
+      <button class="ghost small" id="btnTemplates">Get blank templates</button>
+    </div>
+    <p class="muted small">Your files are read only inside this page on your device. Nothing is uploaded or saved. A policy listing PDF covers both boxes: load all its pages together.</p>
+    <div class="drops">
+      <div class="drop" id="dropCust">
+        <h3>Customer or policy list</h3>
+        <p class="small muted">Policy listing PDF, or a customer list with name, birthday, phone, email. Excel, CSV or PDF. You can pick several files.</p>
+        <p class="file" id="fileCust">No file loaded</p>
+        <div class="row">
+          <label class="btn primary" for="inCust">Choose files</label>
+          <button class="ghost" data-paste="cust">Paste rows</button>
+        </div>
+        <input type="file" id="inCust" multiple accept=".xlsx,.xls,.csv,.pdf,.png,.jpg,.jpeg,image/*">
+      </div>
+      <div class="drop" id="dropPrem">
+        <h3>Premium list</h3>
+        <p class="small muted">Only needed if premiums are in a separate file: policy no, amount, due date, plus customer ID, phone or name.</p>
+        <p class="file" id="filePrem">No file loaded</p>
+        <div class="row">
+          <label class="btn primary" for="inPrem">Choose files</label>
+          <button class="ghost" data-paste="prem">Paste rows</button>
+        </div>
+        <input type="file" id="inPrem" multiple accept=".xlsx,.xls,.csv,.pdf,.png,.jpg,.jpeg,image/*">
+      </div>
+    </div>
+    <details id="settingsBox">
+      <summary>Settings</summary>
+      <div class="fields" style="margin-top:12px">
+        <label for="setRun">Run the week from
+          <input type="date" id="setRun"></label>
+        <label for="setLead">Remind me this many days before
+          <input type="number" id="setLead" min="0" max="14"></label>
+        <label for="setWin">Days covered by one run
+          <input type="number" id="setWin" min="1" max="31"></label>
+        <label for="setStyle">Birthday card style 生日卡风格
+          <select id="setStyle"><option value="gold">金色典雅 Elegant gold</option><option value="red">红色喜庆 Chinese red</option><option value="floral">花卉 Floral</option><option value="balloons">气球 Balloons</option></select></label>
+        <label for="setOver">Show overdue premiums up to (days)
+          <input type="number" id="setOver" min="1" max="3650"></label>
+        <label for="setOrder">Dates like 05/03 mean
+          <select id="setOrder"><option value="DMY">5 March (day/month)</option><option value="MDY">May 3 (month/day)</option></select></label>
+        <label for="setLang">Message language
+          <select id="setLang"><option value="both">English + 中文</option><option value="en">English</option><option value="zh">中文</option></select></label>
+        <label for="setSign">Sign messages as
+          <input type="text" id="setSign" placeholder="Your name"></label>
+        <label for="setOrg">Your company (optional, in messages)
+          <input type="text" id="setOrg" placeholder="e.g. your agency name"></label>
+        <label class="check" for="setTidy"><input type="checkbox" id="setTidy"> Write CAPITAL names as Lim Mei Ling in messages</label>
+      </div>
+    </details>
+  </section>
+
+  <section class="panel" id="checkPanel">
+    <div class="row" style="justify-content:space-between">
+      <h2>2 · Check the data</h2>
+      <span class="small muted" id="checkSummary"></span>
+    </div>
+    <p class="small muted">Rows that can't be read safely are left out and listed here. Fix them in your file and load it again. Nothing is guessed.</p>
+    <details id="mapBox">
+      <summary>Columns found in your files</summary>
+      <div id="mapArea" style="display:flex;flex-direction:column;gap:14px;margin-top:12px"></div>
+    </details>
+    <div class="issues" id="issueList"></div>
+  </section>
+
+  <section class="panel" id="sendPanel">
+    <div class="row" style="justify-content:space-between">
+      <h2>3 · Send this week's messages</h2>
+      <div class="row">
+        <button id="btnPreview">Preview PDF</button>
+        <button class="primary" id="btnPdf">Download PDF</button>
+      </div>
+    </div>
+    <div class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-tab="bday">Birthdays</button>
+      <button role="tab" data-tab="due">Premiums due</button>
+      <button role="tab" data-tab="over">Overdue</button>
+      <button role="tab" data-tab="check">Rows to check</button>
+    </div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <details class="panel guide">
+    <summary>How to use this every Monday</summary>
+    <ol>
+      <li>Download your latest policy listing as PDF (all pages), or export a customer list as Excel or CSV.</li>
+      <li>Open this page and load the files in step 1. Pick all the PDF pages at once.</li>
+      <li>Look at step 2. Anything marked "Left out" wasn't used. Fix it in the source if needed.</li>
+      <li>In step 3, edit a message if you like, then tap <b>Copy</b> and paste it into WhatsApp, SMS or email. If the list has phone numbers, <b>WhatsApp…</b> opens the chat with the message ready; you still press Send yourself.</li>
+      <li>Tap <b>Mark sent</b> so you know it's done. Tap <b>Download PDF</b> for the week's list with greeting cards and messages.</li>
+    </ol>
+  </details>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script>
+(function(){
+"use strict";
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem("bpr."+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem("bpr."+k, JSON.stringify(v)); }catch(e){} }
+};
+const MON_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAY_EN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MONTHS = {jan:1,january:1,januari:1,feb:2,february:2,februari:2,mar:3,march:3,mac:3,apr:4,april:4,may:5,mei:5,jun:6,june:6,jul:7,july:7,julai:7,aug:8,august:8,ogos:8,ogo:8,sep:9,sept:9,september:9,oct:10,october:10,okt:10,oktober:10,nov:11,november:11,dec:12,december:12,dis:12,disember:12};
+const dim = (y,m) => new Date(y, m, 0).getDate();
+const mk = (y,m,d) => new Date(y, m-1, d);
+const addDays = (dt, n) => new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+n);
+const diffDays = (a, b) => Math.round((b - a) / 864e5);
+const iso = dt => dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
+const fmtEN = (dt, wd) => (wd ? DAY_EN[dt.getDay()]+", " : "") + dt.getDate()+" "+MON_EN[dt.getMonth()]+" "+dt.getFullYear();
+const fmtZH = dt => dt.getFullYear()+"年"+(dt.getMonth()+1)+"月"+dt.getDate()+"日";
+const LANG_NAME = {en: "English", zh: "中文"};
+const fmtShort = dt => DAY_EN[dt.getDay()]+" "+dt.getDate()+" "+MON_EN[dt.getMonth()];
+const money = n => n.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
+const normName = s => String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+const plural = (n, w, ws) => n + " " + (n === 1 ? w : (ws || w + "s"));
+function todayLocal(){ const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+function hash(s){ let h = 2166136261; for (const ch of String(s)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function titleCase(s){
+  const t = String(s || "").toLowerCase().replace(/(^|[\s.\-\/'(])([a-z])/g, (m, a, b) => a + b.toUpperCase());
+  return t.replace(/\b(Bin|Binti|Bt|Bte|Anak|Of)\b/g, w => w.toLowerCase()).replace(/\bA\/(L|P)\b/g, (m, x) => "a/" + x.toLowerCase());
+}
+const nice = s => (S.tidy && s && s === s.toUpperCase() && /[A-Z]/.test(s)) ? titleCase(s) : (s || "");
+const joinList = (arr, and) => arr.length < 2 ? arr.join("") : arr.slice(0, -1).join(", ") + " " + and + " " + arr[arr.length - 1];
+
+/* ---------- state ---------- */
+const S = {
+  run: todayLocal(),
+  lead: store.get("lead", 3), win: store.get("win", 7),
+  order: store.get("order", "DMY"), lang: ({en: "en", zh: "zh"})[store.get("lang", "both")] || "both",
+  org: store.get("org", ""), sign: store.get("sign", ""), tidy: store.get("tidy", true), overMax: store.get("overMax", 90),
+  cust: null, prem: null, combined: false, meta: {},
+  customers: [], premiums: [], issues: [], stats: {},
+  week: {bday:[], due:[], over:[]},
+  tab: "bday", demo: false, shown: 40,
+  edits: {}, cardLang: {}, sent: store.get("sent", {}), phones: store.get("phones", {}),
+  cardStyle: store.get("cardStyle", "gold"), cardStyleFor: {}
+};
+
+/* ---------- column detection ---------- */
+const FIELDS = {
+  cust: [
+    ["id","Customer ID",["customer id","cust id","client id","cif","customer no","customer number","id"]],
+    ["name","Name",["customer name","client name","policy holder","policyholder","full name","name","nama","nama pelanggan"]],
+    ["company","Company",["company","company name","syarikat","employer","organisation","organization","business"]],
+    ["birthday","Birthday",["birthday","date of birth","birth date","birthdate","dob","tarikh lahir","hari jadi"]],
+    ["phone","Phone",["phone","mobile","handphone","hp","contact","contact no","tel","telephone","whatsapp","no telefon","phone no","phone number","mobile no"]],
+    ["email","Email",["email","e mail","emel","email address","mail"]],
+    ["manager","Account manager",["account manager","relationship manager","manager","servicing agent","officer","pegawai"]]
+  ],
+  prem: [
+    ["id","Customer ID",["customer id","cust id","client id","cif","customer no","customer number","id"]],
+    ["name","Name",["customer name","client name","policy holder","policyholder","full name","name","nama"]],
+    ["phone","Phone",["phone","mobile","handphone","hp","contact","contact no","tel","whatsapp","phone no","phone number"]],
+    ["policy","Policy no",["policy no","policy number","policy","polisi","no polisi","certificate","cert no"]],
+    ["insured","Life assured",["life assured","life insured","insured","insured person"]],
+    ["amount","Premium (RM)",["premium amount","amount","premium","amaun","amount due","rm"]],
+    ["due","Due date",["due date","premium due date","premium due","next due","due","tarikh akhir","tarikh bayaran"]],
+    ["status","Status",["status","payment status","policy status"]]
+  ]
+};
+const REQUIRED = { cust: ["name","birthday"], prem: ["due"] };
+const normHead = s => String(s ?? "").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+
+function detectMap(header, kind){
+  const cands = [];
+  header.forEach((h, col) => {
+    const H = normHead(h); if (!H) return;
+    FIELDS[kind].forEach(([f,,syn]) => syn.forEach(s => {
+      if (H === s) cands.push({f, col, score: 100 + s.length});
+      else if ((" "+H+" ").includes(" "+s+" ")) cands.push({f, col, score: s.length});
+    }));
+  });
+  cands.sort((a,b) => b.score - a.score);
+  const map = {}, used = new Set();
+  for (const c of cands) { if (map[c.f] == null && !used.has(c.col)) { map[c.f] = c.col; used.add(c.col); } }
+  return map;
+}
+function findHeader(rows){
+  let best = null;
+  for (let i = 0; i < Math.min(rows.length, 15); i++) {
+    const n = Math.max(Object.keys(detectMap(rows[i], "cust")).length, Object.keys(detectMap(rows[i], "prem")).length);
+    if (n >= 2 && (!best || n > best.n)) best = {i, n};
+  }
+  return best;
+}
+function tableFrom(rows, source, how){
+  const h = findHeader(rows); if (!h) return null;
+  const header = rows[h.i].map(x => String(x ?? ""));
+  const noCol = normHead(header[0]) === "no" ? 0 : -1;
+  const body = rows.slice(h.i + 1).map((r, k) => ({cells: r, src: source, label: (noCol === 0 && /^\d+$/.test(String(r[0]).trim())) ? "No. " + String(r[0]).trim() : "row " + (h.i + k + 2)}))
+    .filter(r => r.cells.some(c => String(c ?? "").trim() !== ""));
+  return {header, body, source, how, score: h.n};
+}
+
+/* ---------- value parsing ---------- */
+function parseDate(v, opts){
+  if (v == null || String(v).trim() === "") return {err: "missing"};
+  const yy2 = y => opts.birth ? (y > (S.run.getFullYear() % 100) ? 1900 + y : 2000 + y) : 2000 + y;
+  const ok = (y, m, d, amb) => {
+    if (!(m >= 1 && m <= 12)) return {err: "bad"};
+    const max = y == null ? (m === 2 ? 29 : dim(2001, m)) : dim(y, m);
+    if (!(d >= 1 && d <= max)) return {err: "bad"};
+    return {y, m, d, amb: !!amb};
+  };
+  if (typeof v === "number") {
+    if (v > 59 && v < 80000) { const t = new Date(Math.round((v - 25569) * 864e5)); return ok(t.getUTCFullYear(), t.getUTCMonth()+1, t.getUTCDate()); }
+    return {err: "bad"};
+  }
+  let s = String(v).trim().toLowerCase().replace(/,/g, " ").replace(/\s+/g, " ");
+  s = s.replace(/[t ]\d{1,2}:\d{2}(:\d{2})?.*$/, "").replace(/(\d)(st|nd|rd|th)\b/g, "$1").trim();
+  let m;
+  if ((m = s.match(/^(\d{4})[-\/. ](\d{1,2})[-\/. ](\d{1,2})$/))) return ok(+m[1], +m[2], +m[3]);
+  if ((m = s.match(/^(\d{1,2})[-\/. ](\d{1,2})(?:[-\/. ](\d{2}|\d{4}))?$/))) {
+    const a = +m[1], b = +m[2]; let y = m[3] ? +m[3] : null; if (m[3] && m[3].length === 2) y = yy2(y);
+    if (y == null && !opts.birth) return {err: "noyear"};
+    if (a > 12 && b <= 12) return ok(y, b, a);
+    if (b > 12 && a <= 12) return ok(y, a, b);
+    if (a <= 12 && b <= 12) return S.order === "DMY" ? ok(y, b, a, a !== b) : ok(y, a, b, a !== b);
+    return {err: "bad"};
+  }
+  if ((m = s.match(/^(\d{1,2})[ \-\/.]?([a-z]+)\.?(?:[ \-\/.]?(\d{2}|\d{4}))?$/)) && MONTHS[m[2]]) {
+    let y = m[3] ? +m[3] : null; if (m[3] && m[3].length === 2) y = yy2(y);
+    if (y == null && !opts.birth) return {err: "noyear"};
+    return ok(y, MONTHS[m[2]], +m[1]);
+  }
+  if ((m = s.match(/^([a-z]+)\.?[ \-]?(\d{1,2})(?:[ \-](\d{2}|\d{4}))?$/)) && MONTHS[m[1]]) {
+    let y = m[3] ? +m[3] : null; if (m[3] && m[3].length === 2) y = yy2(y);
+    if (y == null && !opts.birth) return {err: "noyear"};
+    return ok(y, MONTHS[m[1]], +m[2]);
+  }
+  return {err: "bad"};
+}
+function parsePhone(v){
+  if (v == null || String(v).trim() === "") return {err: "missing"};
+  let raw = typeof v === "number" ? String(Math.round(v)) : String(v).trim();
+  let multi = false;
+  const parts = raw.split(/\s*(?:\/|;|,|\bor\b|&)\s*/i).filter(Boolean);
+  if (parts.length > 1) { multi = true; raw = parts[0]; }
+  const plus = raw.startsWith("+");
+  let d = raw.replace(/\D/g, "");
+  if (!d) return {err: "nodigits", raw};
+  if (d.startsWith("60")) {}
+  else if (d.startsWith("0")) d = "6" + d;
+  else if (d.startsWith("1") && d.length >= 9 && d.length <= 10 && !plus) d = "60" + d;
+  else if (!plus) return {err: "country", raw};
+  let mobile = false;
+  if (d.startsWith("601")) { if (d.length < 11 || d.length > 12) return {err: "length", raw}; mobile = true; }
+  else if (d.startsWith("60")) { if (d.length < 10 || d.length > 11) return {err: "length", raw}; }
+  else if (d.length < 8 || d.length > 15) return {err: "length", raw};
+  let display = "+" + d;
+  if (d.startsWith("60")) { const rest = d.slice(4); display = "+60 " + d.slice(2,4) + "-" + rest.slice(0, rest.length - 4) + " " + rest.slice(-4); }
+  return {wa: d, display, mobile, multi};
+}
+function parseAmount(v){
+  if (v == null || String(v).trim() === "") return {err: "missing"};
+  if (typeof v === "number") return {n: v};
+  const s = String(v).replace(/rm|myr/ig, "").replace(/,/g, "").trim();
+  if (!/^-?\d+(\.\d+)?$/.test(s)) return {err: "bad"};
+  return {n: +s};
+}
+/* Which policy statuses mean "don't remind": returns a category, or null for an active policy */
+function statusSkip(status){
+  const s = String(status || "").toLowerCase();
+  if (!s) return null;
+  if (/\b(unpaid|not paid|belum|outstanding)\b/.test(s)) return null;
+  if (/fully paid/.test(s)) return "fully paid";
+  if (/waived/.test(s)) return "premium waived";
+  if (/lapse/.test(s)) return "lapsed";
+  if (/terminat|surrender|cancel|matured|death|batal/.test(s)) return "terminated";
+  if (/waiting|withdrawn|declined|postponed|pending|underwriting/.test(s)) return "not yet in force";
+  if (/\b(paid|settled|dibayar|lunas|jelas)\b/.test(s)) return "paid";
+  return null;
+}
+const cell = (r, map, f) => map[f] == null ? "" : r.cells[map[f]];
+const txt = v => String(v ?? "").replace(/\s+/g, " ").trim();
+const validEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s);
+
+/* ---------- processing ---------- */
+function issue(level, where, who, text){ S.issues.push({level, where, who, text}); }
+const whereOf = (r, src) => `${r.src || src}, ${r.label}`;
+
+function readBirthday(raw, where, name){
+  const d = parseDate(raw, {birth: true});
+  if (d.err === "missing") { issue("warn", where, name, "No birthday in the file, so no birthday reminder."); return null; }
+  if (d.err) { issue("error", where, name, `Birthday "${txt(raw)}" isn't a real date. Fix it in your file.`); return null; }
+  if (d.y != null && (d.y < 1900 || mk(d.y, d.m, d.d) > S.run)) { issue("error", where, name, `Birthday year ${d.y} looks wrong. Fix it in your file.`); return null; }
+  return d;
+}
+function readPhone(raw, where, name){
+  const p = parsePhone(raw);
+  if (p.err === "missing") { issue("warn", where, name, "No phone number. You can still copy the message."); return null; }
+  if (p.err) { issue("warn", where, name, `Phone "${txt(raw)}" looks incomplete. WhatsApp button turned off for this customer.`); return null; }
+  if (p.multi) issue("info", where, name, `More than one phone number. Using the first: ${p.display}.`);
+  else if (!p.mobile && p.wa.startsWith("60")) issue("info", where, name, `${p.display} looks like an office line. WhatsApp may not work.`);
+  return p;
+}
+function readPremium(r, map, where, label, st){
+  const draw = cell(r, map, "due"); const due = parseDate(draw, {birth: false});
+  if (due.err === "missing") { issue("error", where, label, "Policy is in force but has no due date. Left out."); return null; }
+  if (due.err) { issue("error", where, label, `Due date "${txt(draw)}" can't be read. Left out.`); return null; }
+  if (due.amb) st.amb++;
+  const p = {policy: txt(cell(r, map, "policy")), insured: txt(cell(r, map, "insured")), amount: null, due: mk(due.y, due.m, due.d), where, match: "none", cust: null};
+  const araw = cell(r, map, "amount");
+  if (map.amount != null) { const a = parseAmount(araw); if (!a.err) p.amount = a.n; else if (a.err === "bad") issue("warn", where, label, `Amount "${txt(araw)}" can't be read, so it's left out of the message.`); }
+  return p;
+}
+
+function processAll(){
+  S.issues = []; S.customers = []; S.premiums = [];
+  const st = {amb: 0, skipped: {}, dupPol: 0};
+  if (S.combined && S.cust) processCombined(st);
+  else { if (S.cust) processCustomers(st); if (S.prem) processPremiums(st); }
+  if (st.amb) issue("info", "Dates", "", `${plural(st.amb, "date")} like 05/03 were read as ${S.order === "DMY" ? "day/month (5 March)" : "month/day (May 3)"}. Change this in Settings if your file uses the other order.`);
+  const sk = Object.entries(st.skipped);
+  if (sk.length) issue("info", S.combined ? "Policy list" : "Premium list", "", `Skipped ${plural(sk.reduce((a, [, n]) => a + n, 0), "policy", "policies")} that need no premium reminder: ` + sk.map(([k, n]) => `${n} ${k}`).join(", ") + ".");
+  if (st.dupPol) issue("info", "Policy list", "", `${plural(st.dupPol, "policy row")} appeared twice and were counted once.`);
+  S.stats = st;
+  buildWeek();
+}
+
+function processCustomers(st){
+  const T = S.cust, map = T.map, src = "Customer list";
+  REQUIRED.cust.forEach(f => { if (map[f] == null) issue("error", src, "", `No "${FIELDS.cust.find(x=>x[0]===f)[1]}" column found. Pick it under "Columns found in your files".`); });
+  if (map.phone == null) issue("info", src, "", "This list has no phone numbers. WhatsApp… still works: type the number once (it's remembered on this device), or leave it empty and pick the chat in WhatsApp.");
+  const seen = new Map();
+  for (const r of T.body) {
+    const where = whereOf(r, src);
+    const name = txt(cell(r, map, "name"));
+    if (!name) { issue("error", where, "", "No customer name. Row left out."); continue; }
+    const c = {name, id: txt(cell(r, map, "id")), company: txt(cell(r, map, "company")), email: txt(cell(r, map, "email")),
+               manager: txt(cell(r, map, "manager")), bday: null, phone: null, flags: []};
+    if (map.birthday != null) { c.bday = readBirthday(cell(r, map, "birthday"), where, name); if (c.bday && c.bday.amb) st.amb++; }
+    if (map.phone != null) c.phone = readPhone(cell(r, map, "phone"), where, name);
+    if (c.email && !validEmail(c.email)) { issue("warn", where, name, `Email "${c.email}" doesn't look right.`); c.email = ""; }
+    const key = c.id ? "id:" + c.id.toLowerCase() : "np:" + normName(name) + "|" + (c.phone ? c.phone.wa : "");
+    if (seen.has(key)) { issue("warn", where, name, `Listed twice (same as ${seen.get(key)}). Second copy ignored.`); continue; }
+    seen.set(key, r.label); c.key = key;
+    S.customers.push(c);
+  }
+}
+
+function processPremiums(st){
+  const T = S.prem, map = T.map, src = "Premium list";
+  if (map.due == null) issue("error", src, "", `No "Due date" column found. Pick it under "Columns found in your files".`);
+  if (map.id == null && map.phone == null && map.name == null) issue("error", src, "", "No customer ID, phone or name column, so premiums can't be matched to customers.");
+  const byId = new Map(), byPhone = new Map(), byName = new Map();
+  for (const c of S.customers) {
+    if (c.id) byId.set(c.id.toLowerCase(), c);
+    if (c.phone) { const k = c.phone.wa; byPhone.set(k, byPhone.has(k) ? "multi" : c); }
+    const n = normName(c.name); byName.set(n, (byName.get(n) || []).concat(c));
+  }
+  const seenPol = new Set();
+  for (const r of T.body) {
+    const where = whereOf(r, src);
+    const pname = txt(cell(r, map, "name")), pid = txt(cell(r, map, "id"));
+    const label = pname || pid || "(no name)";
+    const cat = statusSkip(cell(r, map, "status"));
+    if (cat) { st.skipped[cat] = (st.skipped[cat] || 0) + 1; continue; }
+    const pol = txt(cell(r, map, "policy")); if (pol) { if (seenPol.has(pol)) { st.dupPol++; continue; } seenPol.add(pol); }
+    const p = readPremium(r, map, where, label, st); if (!p) continue;
+    let rowPhone = null;
+    if (map.phone != null) { const ph = parsePhone(cell(r, map, "phone")); if (!ph.err) rowPhone = ph; }
+    if (pid && byId.has(pid.toLowerCase())) { p.cust = byId.get(pid.toLowerCase()); p.match = "id"; }
+    else if (rowPhone && byPhone.get(rowPhone.wa) && byPhone.get(rowPhone.wa) !== "multi") { p.cust = byPhone.get(rowPhone.wa); p.match = "phone"; }
+    else if (pname) {
+      const hits = byName.get(normName(pname)) || [];
+      if (hits.length === 1) { p.cust = hits[0]; p.match = "name"; issue("info", where, pname, "Matched to the customer list by name only. Check it's the right person."); }
+      else if (hits.length > 1) issue("warn", where, pname, `Name matches ${hits.length} customers, so details come from the premium list only.`);
+    }
+    if (!p.cust) {
+      if (!pname && !rowPhone) { issue("error", where, label, "Can't find this customer and the row has no name or phone. Row left out."); continue; }
+      p.cust = {key: "prem:" + normName(pname) + "|" + (rowPhone ? rowPhone.wa : pid), name: pname || pid, company: "", email: "", manager: "", phone: rowPhone, id: pid, flags: []};
+      if (S.cust) issue("warn", where, label, "Not found in the customer list. Using the name and phone from the premium list.");
+    } else if (!p.cust.phone && rowPhone) {
+      p.cust = Object.assign({}, p.cust, {phone: rowPhone});
+    }
+    S.premiums.push(p);
+  }
+}
+
+/* A policy listing: one row per policy, with the holder's DOB and the premium due date in the same file */
+function processCombined(st){
+  const T = S.cust, cm = S.cust.map, pm = S.prem.map, src = "Policy list";
+  REQUIRED.cust.forEach(f => { if (cm[f] == null) issue("error", src, "", `No "${FIELDS.cust.find(x=>x[0]===f)[1]}" column found. Pick it under "Columns found in your files".`); });
+  if (cm.phone == null) issue("info", src, "", "This list has no phone numbers or emails. WhatsApp… still works: type the number once (it's remembered on this device), or leave it empty and pick the chat in WhatsApp.");
+  const holders = new Map(), seenPol = new Set();
+  for (const r of T.body) {
+    const where = whereOf(r, src);
+    const name = txt(cell(r, cm, "name"));
+    if (!name) { issue("error", where, "", "No policy holder name. Row left out."); continue; }
+    const pol = txt(cell(r, pm, "policy"));
+    if (pol) { if (seenPol.has(pol)) { st.dupPol++; continue; } seenPol.add(pol); }
+    const braw = cell(r, cm, "birthday"), bp = parseDate(braw, {birth: true});
+    const key = normName(name) + "|" + (bp.err ? "" : `${bp.y}-${bp.m}-${bp.d}`);
+    let h = holders.get(key);
+    if (!h) {
+      h = {key, name, id: "", company: txt(cell(r, cm, "company")), email: txt(cell(r, cm, "email")), manager: txt(cell(r, cm, "manager")),
+           phone: null, bday: null, active: false, deceased: false, flags: [], nPol: 0};
+      if (cm.birthday != null) { h.bday = readBirthday(braw, where, name); if (h.bday && h.bday.amb) st.amb++; }
+      if (cm.phone != null) h.phone = readPhone(cell(r, cm, "phone"), where, name);
+      if (h.email && !validEmail(h.email)) h.email = "";
+      holders.set(key, h);
+    }
+    h.nPol++;
+    const status = txt(cell(r, pm, "status")), insured = txt(cell(r, pm, "insured"));
+    const cat = statusSkip(status);
+    if (!cat || cat === "fully paid" || cat === "premium waived") h.active = true;
+    if (/death/i.test(status)) {
+      if (!insured || normName(insured) === normName(name)) h.deceased = true;
+      else h.flags.push(`Policy ${pol} for ${nice(insured)} ended because of a death. Please check before sending a birthday wish.`);
+    }
+    if (cat) { st.skipped[cat] = (st.skipped[cat] || 0) + 1; continue; }
+    const p = readPremium(r, pm, where, name, st); if (!p) continue;
+    p.cust = h; p.match = "file";
+    S.premiums.push(p);
+  }
+  S.customers = [...holders.values()];
+  const inactive = S.customers.filter(c => !c.active).length;
+  for (const c of S.customers.filter(c => c.deceased)) issue("warn", src, c.name, "A policy record shows this customer has died, so there's no birthday wish or premium reminder.");
+  if (inactive) issue("info", src, "", `${plural(inactive, "customer")} ${inactive === 1 ? "has" : "have"} no policy in force (lapsed, terminated or not yet issued), so no birthday wish.`);
+  S.premiums = S.premiums.filter(p => !p.cust.deceased);
+}
+
+function buildWeek(){
+  const run = S.run, horizon = S.lead + S.win - 1;
+  const bday = [], groups = new Map();
+  for (const c of S.customers) {
+    if (!c.bday || c.active === false || c.deceased) continue;
+    let y = run.getFullYear(), note = "";
+    const at = yr => (c.bday.m === 2 && c.bday.d === 29 && dim(yr, 2) === 28) ? mk(yr, 2, 28) : mk(yr, c.bday.m, c.bday.d);
+    let ev = at(y); if (ev < run) ev = at(++y);
+    if (c.bday.m === 2 && c.bday.d === 29 && ev.getDate() === 28) note = "Born 29 Feb, so marked on 28 Feb this year.";
+    const days = diffDays(run, ev);
+    if (days > horizon) continue;
+    const rem = addDays(ev, -S.lead);
+    const age = c.bday.y != null ? ev.getFullYear() - c.bday.y : null;
+    bday.push({type: "bday", id: "bday:" + c.key + "|" + iso(ev), c, ev, days, age, remind: rem < run ? run : rem, note});
+  }
+  let hiddenOver = 0;
+  for (const p of S.premiums) {
+    const days = diffDays(run, p.due);
+    const type = days < 0 ? "over" : days <= horizon ? "due" : null;
+    if (!type) continue;
+    if (type === "over" && -days > S.overMax) { hiddenOver++; continue; }
+    const gk = type + "|" + p.cust.key + "|" + iso(p.due);
+    if (!groups.has(gk)) {
+      const rem = addDays(p.due, -S.lead);
+      groups.set(gk, {type, id: "prem:" + gk, c: p.cust, ps: [], ev: p.due, days, remind: type === "over" || rem < run ? run : rem});
+    }
+    groups.get(gk).ps.push(p);
+  }
+  const due = [], over = [];
+  for (const g of groups.values()) { g.p = g.ps[0]; (g.type === "due" ? due : over).push(g); }
+  const byRem = (a, b) => (a.remind - b.remind) || (a.ev - b.ev) || a.c.name.localeCompare(b.c.name);
+  bday.sort(byRem); due.sort(byRem); over.sort((a, b) => (b.ev - a.ev) || a.c.name.localeCompare(b.c.name));
+  S.week = {bday, due, over, hiddenOver};
+}
+
+/* ---------- messages ---------- */
+function signOff(c){ return c.manager || S.sign || "Your agent"; }
+function polPhrase(it, lang){
+  const ps = it.ps, hn = normName(it.c.name);
+  const other = p => p.insured && normName(p.insured) !== hn;
+  const total = ps.every(p => p.amount != null) ? ps.reduce((a, p) => a + p.amount, 0) : null;
+  if (lang === "zh") {
+    if (ps.length === 1) {
+      const p = ps[0];
+      return {text: `您${p.policy ? "保单 " + p.policy + (other(p) ? "" : " ") : ""}${other(p) ? "（受保人：" + nice(p.insured) + "）" : ""}的保费${p.amount != null ? " RM " + money(p.amount) : ""}，`, many: true};
+    }
+    const items = ps.map(p => `${p.policy || "?"}${other(p) || p.amount != null ? "（" + [other(p) ? nice(p.insured) : "", p.amount != null ? "RM " + money(p.amount) : ""].filter(Boolean).join("，") + "）" : ""}`);
+    return {text: `您以下保单的保费${total != null ? "（合计 RM " + money(total) + "）" : ""}：${items.slice(0, -1).join("、")}及${items[items.length - 1]}，`, many: true};
+  }
+  const forWho = p => other(p) ? " for " + nice(p.insured) : "";
+  if (ps.length === 1) {
+    const p = ps[0];
+    return {text: "your premium" + (p.amount != null ? ` of RM ${money(p.amount)}` : "") + (p.policy ? ` for policy ${p.policy}` : "") + forWho(p), many: false};
+  }
+  const items = ps.map(p => `${p.policy || "?"}${forWho(p)}${p.amount != null ? " (RM " + money(p.amount) + ")" : ""}`);
+  return {text: `your premiums for policies ${joinList(items, "and")}${total != null ? `, RM ${money(total)} in total,` : ""}`, many: true};
+}
+function baseMsg(it, lang){
+  const c = it.c, name = nice(c.name), sign = signOff(c), org = S.org.trim();
+  if (it.type === "bday") {
+    return lang === "en"
+      ? `Dear ${name},\n\nHappy Birthday! ${org ? "All of us at " + org + " wish" : "I wish"} you good health, happiness and success in the year ahead. Thank you for your continued trust.\n\nWarm regards,\n${sign}`
+      : `亲爱的 ${name}：\n\n祝您生日快乐！${org ? org + "全体同仁" : "我"}衷心祝福您在新的一岁身体健康、幸福快乐、事事顺心。感谢您一直以来的信任与支持。\n\n${sign} 敬上`;
+  }
+  const ph = polPhrase(it, lang), due = it.ev;
+  if (it.type === "due") {
+    return lang === "en"
+      ? `Dear ${name},\n\nThis is a friendly reminder that ${ph.text} ${ph.many ? "are" : "is"} due on ${fmtEN(due)}. Kindly make payment by the due date to keep your coverage active. If you have already paid, please ignore this message.\n\nThank you,\n${sign}`
+      : `亲爱的 ${name}：\n\n温馨提醒：${ph.text}将于 ${fmtZH(due)} 到期缴付。请在到期日前完成缴费，以确保您的保障持续有效。如您已缴付，请忽略此信息。\n\n谢谢！\n${sign}`;
+  }
+  return lang === "en"
+    ? `Dear ${name},\n\nOur records show that ${ph.text}, due on ${fmtEN(due)}, ${ph.many ? "have" : "has"} not been received yet. Kindly make payment as soon as possible to avoid any interruption to your coverage. If you have already paid, please ignore this message.\n\nThank you,\n${sign}`
+    : `亲爱的 ${name}：\n\n根据我们的记录，${ph.text}原定于 ${fmtZH(due)} 缴付，目前尚未收到。请尽快完成缴费，以免影响您的保障。如您已缴付，请忽略此信息。\n\n谢谢！\n${sign}`;
+}
+const msgFor = (it, lang) => S.edits[it.id + "|" + lang] ?? baseMsg(it, lang);
+const langsFor = it => { const l = S.cardLang[it.id] || S.lang; return l === "both" ? ["en","zh"] : [l]; };
+
+/* ---------- birthday card image ---------- */
+let fontsReady = null;
+function ensureFonts(){
+  if (!fontsReady) fontsReady = Promise.all([
+    document.fonts.load('800 100px "Bricolage Grotesque"'), document.fonts.load('600 30px "Figtree"'),
+    document.fonts.load('120px "Great Vibes"'), document.fonts.load('700 60px "Cormorant Garamond"'),
+    document.fonts.load('700 60px "Noto Serif SC"', ZH_CHARS)
+  ]).catch(() => {});
+  return fontsReady;
+}
+const imgCache = new Map();
+const CJK_FONT = `Figtree, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif`;
+/* Chinese text in the PDF is drawn as a picture, since the PDF's built-in fonts have no Chinese characters */
+function zhImage(text, wMm){
+  const s = 6.5, W = Math.round(wMm * s), fs = 22, lh = 33;
+  const cv = document.createElement("canvas"), g = cv.getContext("2d");
+  const font = `${fs}px ${CJK_FONT}`; g.font = font;
+  const lines = [], re = /[⺀-鿿豈-﫿＀-￯　-〿]|[^\s⺀-鿿豈-﫿＀-￯　-〿]+|\s+/g;
+  for (const para of String(text).split("\n")) {
+    if (!para) { lines.push(""); continue; }
+    let cur = "";
+    for (const t of para.match(re) || []) {
+      if (g.measureText(cur + t).width > W && cur.trim()) { lines.push(cur.trimEnd()); cur = t.trimStart(); } else cur += t;
+    }
+    lines.push(cur);
+  }
+  cv.width = W; cv.height = lines.length * lh + 10;
+  g.fillStyle = "#F2F3F8"; g.fillRect(0, 0, cv.width, cv.height);
+  g.font = font; g.fillStyle = "#1A2042"; g.textBaseline = "top";
+  lines.forEach((ln, i) => g.fillText(ln, 0, i * lh + 4));
+  return {url: cv.toDataURL("image/jpeg", .75), h: cv.height / s};
+}
+/* Birthday cards: drawn on a 1200x675 canvas, entirely on the device */
+const ZH_CHARS = "生日快乐福寿身体健康万事如意东海比南山·";
+const ZH_SERIF = `"Noto Serif SC", "Songti SC", "STSong", "SimSun", ${CJK_FONT}`;
+const SCRIPT = `"Great Vibes", "Brush Script MT", cursive`;
+const SERIF = `"Cormorant Garamond", Georgia, serif`;
+const SANS = `Figtree, "Segoe UI", sans-serif`;
+const CARD_STYLES = {gold: "金色典雅 Elegant gold", red: "红色喜庆 Chinese red", floral: "花卉 Floral", balloons: "气球 Balloons"};
+const styleFor = it => S.cardStyleFor[it.id] || S.cardStyle;
+const setSp = (g, n) => { try { g.letterSpacing = n + "px"; } catch (e) {} };
+function fitFont(g, text, max, size, min, fam, weight){
+  let s = size; g.font = `${weight || ""} ${s}px ${fam}`;
+  while (g.measureText(text).width > max && s > min) { s -= 2; g.font = `${weight || ""} ${s}px ${fam}`; }
+}
+function goldFill(g, y0, y1){
+  const gr = g.createLinearGradient(0, y0, 0, y1);
+  gr.addColorStop(0, "#FBE7A6"); gr.addColorStop(.45, "#D9AE52"); gr.addColorStop(.7, "#B07F2C"); gr.addColorStop(1, "#F3D58A");
+  return gr;
+}
+function sparkle(g, x, y, r){
+  g.beginPath(); g.moveTo(x, y - r); g.quadraticCurveTo(x, y, x + r, y); g.quadraticCurveTo(x, y, x, y + r);
+  g.quadraticCurveTo(x, y, x - r, y); g.quadraticCurveTo(x, y, x, y - r); g.fill();
+}
+function diamond(g, x, y, s){ g.save(); g.translate(x, y); g.rotate(Math.PI / 4); g.fillRect(-s, -s, 2 * s, 2 * s); g.restore(); }
+function cardGold(g, rnd, t){
+  const bg = g.createRadialGradient(600, 320, 60, 600, 320, 760); bg.addColorStop(0, "#1E2B4A"); bg.addColorStop(1, "#080D1A");
+  g.fillStyle = bg; g.fillRect(0, 0, 1200, 675);
+  g.fillStyle = "#E9C46A";
+  for (let i = 0; i < 55; i++) { g.globalAlpha = .05 + rnd() * .16; g.beginPath(); g.arc(rnd() * 1200, rnd() * 675, 3 + rnd() * 34, 0, 7); g.fill(); }
+  g.fillStyle = "#F6DE9A";
+  for (let i = 0; i < 40; i++) { const x = rnd() * 1200, y = rnd() * 675; if (x > 190 && x < 1010 && y > 100 && y < 625) continue; g.globalAlpha = .5 + rnd() * .5; sparkle(g, x, y, 4 + rnd() * 10); }
+  g.globalAlpha = 1;
+  g.strokeStyle = goldFill(g, 0, 675); g.lineWidth = 3; g.strokeRect(30, 30, 1140, 615); g.lineWidth = 1.2; g.strokeRect(42, 42, 1116, 591);
+  g.fillStyle = goldFill(g, 0, 675); for (const [x, y] of [[42, 42], [1158, 42], [42, 633], [1158, 633]]) diamond(g, x, y, 7);
+  g.textAlign = "center"; g.textBaseline = "alphabetic";
+  g.fillStyle = goldFill(g, 130, 180); g.font = `700 46px ${ZH_SERIF}`; setSp(g, 16); g.fillText("生日快乐", 608, 168); setSp(g, 0);
+  g.fillStyle = goldFill(g, 200, 320); g.font = `124px ${SCRIPT}`; g.fillText("Happy Birthday", 600, 300);
+  g.strokeStyle = "#C99B45"; g.lineWidth = 1.5; g.beginPath(); g.moveTo(420, 342); g.lineTo(580, 342); g.moveTo(620, 342); g.lineTo(780, 342); g.stroke();
+  g.fillStyle = "#E7C26C"; diamond(g, 600, 342, 6);
+  g.fillStyle = "#FFFFFF"; fitFont(g, t.nm, 900, 66, 32, SERIF, "700"); g.fillText(t.nm, 600, 422);
+  if (t.company) { g.fillStyle = "#AEB8D3"; fitFont(g, t.company, 900, 26, 16, SANS, "500"); g.fillText(t.company, 600, 464); }
+  g.fillStyle = goldFill(g, 518, 552); g.font = `700 30px ${ZH_SERIF}`; setSp(g, 6); g.fillText(t.wish, 603, 548); setSp(g, 0);
+  g.fillStyle = "#AEB8D3"; fitFont(g, t.from, 1000, 22, 14, SANS, "500"); g.fillText(t.from, 600, 596);
+}
+function cardRed(g, rnd, t){
+  const bg = g.createLinearGradient(0, 0, 1200, 675); bg.addColorStop(0, "#C8161D"); bg.addColorStop(1, "#7A0A10");
+  g.fillStyle = bg; g.fillRect(0, 0, 1200, 675);
+  g.strokeStyle = "rgba(255,215,130,.11)"; g.lineWidth = 2;
+  for (let y = 60, row = 0; y < 720; y += 64, row++) for (let x = (row % 2) * 70 - 40; x < 1260; x += 140) {
+    g.beginPath(); g.arc(x, y, 26, Math.PI, 0); g.stroke(); g.beginPath(); g.arc(x + 40, y, 14, Math.PI, 0); g.stroke();
+  }
+  g.strokeStyle = goldFill(g, 0, 675); g.lineWidth = 4; g.strokeRect(28, 28, 1144, 619); g.lineWidth = 1.5; g.strokeRect(40, 40, 1120, 595);
+  g.lineWidth = 3;
+  for (const [x, y, sx, sy] of [[40, 40, 1, 1], [1160, 40, -1, 1], [40, 635, 1, -1], [1160, 635, -1, -1]]) {
+    g.beginPath(); g.moveTo(x + sx * 70, y + sy * 14); g.lineTo(x + sx * 14, y + sy * 14); g.lineTo(x + sx * 14, y + sy * 70);
+    g.moveTo(x + sx * 46, y + sy * 28); g.lineTo(x + sx * 28, y + sy * 28); g.lineTo(x + sx * 28, y + sy * 46); g.stroke();
+  }
+  const cx = 935, cy = 335;
+  g.fillStyle = "rgba(255,210,120,.18)"; g.beginPath(); g.arc(cx, cy, 200, 0, 7); g.fill();
+  const mg = g.createRadialGradient(cx - 50, cy - 60, 20, cx, cy, 175); mg.addColorStop(0, "#FFEBB0"); mg.addColorStop(.6, "#E2B04F"); mg.addColorStop(1, "#A9741F");
+  g.fillStyle = mg; g.beginPath(); g.arc(cx, cy, 170, 0, 7); g.fill();
+  g.strokeStyle = "#8E0B11"; g.lineWidth = 4; g.beginPath(); g.arc(cx, cy, 148, 0, 7); g.stroke(); g.lineWidth = 1.5; g.beginPath(); g.arc(cx, cy, 136, 0, 7); g.stroke();
+  g.fillStyle = "#A10E15"; g.textAlign = "center"; g.textBaseline = "middle"; g.font = `700 172px ${ZH_SERIF}`; g.fillText(t.elder ? "寿" : "福", cx, cy + 6);
+  g.fillStyle = "#FFD98A";
+  for (let i = 0; i < 18; i++) { const x = 720 + rnd() * 420, y = 70 + rnd() * 540; if (Math.hypot(x - cx, y - cy) < 215) continue; g.globalAlpha = .5 + rnd() * .5; sparkle(g, x, y, 4 + rnd() * 8); }
+  g.globalAlpha = 1; g.textBaseline = "alphabetic"; g.textAlign = "left";
+  g.fillStyle = goldFill(g, 150, 240); g.font = `700 92px ${ZH_SERIF}`; setSp(g, 10); g.fillText("生日快乐", 92, 232); setSp(g, 0);
+  g.fillStyle = "#FFE3A6"; g.font = `80px ${SCRIPT}`; g.fillText("Happy Birthday", 98, 328);
+  g.fillStyle = "#FFFFFF"; fitFont(g, t.nm, 620, 58, 28, SERIF, "700"); g.fillText(t.nm, 98, 420);
+  if (t.company) { g.fillStyle = "#F6C9B8"; fitFont(g, t.company, 620, 26, 16, SANS, "500"); g.fillText(t.company, 98, 460); }
+  g.fillStyle = goldFill(g, 515, 552); g.font = `700 32px ${ZH_SERIF}`; setSp(g, 4); g.fillText(t.wish, 98, 545); setSp(g, 0);
+  g.fillStyle = "#F6C9B8"; fitFont(g, t.from, 640, 22, 13, SANS, "500"); g.fillText(t.from, 98, 595);
+}
+function flower(g, x, y, r, col, rnd){
+  const n = 5 + Math.floor(rnd() * 2), rot = rnd() * Math.PI;
+  for (let i = 0; i < n; i++) {
+    const a = rot + i * 2 * Math.PI / n;
+    g.save(); g.translate(x + Math.cos(a) * r * .42, y + Math.sin(a) * r * .42); g.rotate(a);
+    const gr = g.createRadialGradient(-r * .2, 0, r * .05, 0, 0, r * .6); gr.addColorStop(0, col[0]); gr.addColorStop(1, col[1]);
+    g.fillStyle = gr; g.beginPath(); g.ellipse(0, 0, r * .55, r * .36, 0, 0, 7); g.fill(); g.restore();
+  }
+  g.fillStyle = "#F2C14E"; g.beginPath(); g.arc(x, y, r * .15, 0, 7); g.fill();
+}
+function leaf(g, x, y, len, a, col){
+  g.save(); g.translate(x, y); g.rotate(a); g.fillStyle = col; g.beginPath(); g.moveTo(0, 0);
+  g.quadraticCurveTo(len * .5, -len * .28, len, 0); g.quadraticCurveTo(len * .5, len * .28, 0, 0); g.fill(); g.restore();
+}
+function cardFloral(g, rnd, t){
+  g.fillStyle = "#FBF4EE"; g.fillRect(0, 0, 1200, 675);
+  const washes = ["rgba(244,182,194,.28)", "rgba(250,214,170,.28)", "rgba(200,224,205,.24)"];
+  for (let i = 0; i < 10; i++) { const x = rnd() * 1200, y = rnd() * 675, r = 140 + rnd() * 220; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, washes[i % 3]); gr.addColorStop(1, "rgba(251,244,238,0)"); g.fillStyle = gr; g.fillRect(0, 0, 1200, 675); }
+  const pal = [["#FBD3DC", "#E37F98"], ["#FFE0C2", "#F29E6B"], ["#F6E4F2", "#C98BBE"], ["#FFFFFF", "#EFB3C2"]];
+  for (const [cx, cy] of [[60, 70], [1140, 70], [60, 610], [1140, 610], [40, 340], [1160, 340]]) {
+    for (let i = 0; i < 8; i++) { const a = rnd() * 7, d = rnd() * 95; leaf(g, cx + Math.cos(a) * d, cy + Math.sin(a) * d, 55 + rnd() * 45, rnd() * 7, rnd() < .5 ? "#9DBF9E" : "#7FA886"); }
+    for (let i = 0; i < 5; i++) { const a = rnd() * 7, d = rnd() * 80; flower(g, cx + Math.cos(a) * d, cy + Math.sin(a) * d, 42 + rnd() * 40, pal[Math.floor(rnd() * pal.length)], rnd); }
+  }
+  g.strokeStyle = "rgba(180,83,107,.35)"; g.lineWidth = 1.5; g.strokeRect(200, 70, 800, 535);
+  g.textAlign = "center"; g.textBaseline = "alphabetic";
+  g.fillStyle = "#B4536B"; g.font = `700 44px ${ZH_SERIF}`; setSp(g, 14); g.fillText("生日快乐", 607, 168); setSp(g, 0);
+  g.font = `128px ${SCRIPT}`; g.fillText("Happy Birthday", 600, 300);
+  g.fillStyle = "#3D2B3A"; fitFont(g, t.nm, 740, 62, 30, SERIF, "700"); g.fillText(t.nm, 600, 404);
+  if (t.company) { g.fillStyle = "#8A6F7D"; fitFont(g, t.company, 740, 26, 16, SANS, "500"); g.fillText(t.company, 600, 446); }
+  g.fillStyle = "#B4536B"; g.font = `700 28px ${ZH_SERIF}`; setSp(g, 6); g.fillText(t.wish, 603, 528); setSp(g, 0);
+  g.fillStyle = "#8A6F7D"; fitFont(g, t.from, 760, 21, 13, SANS, "500"); g.fillText(t.from, 600, 576);
+}
+function cardBalloons(g, rnd, t){
+  const grd = g.createLinearGradient(0, 0, 1200, 675); grd.addColorStop(0, "#1C2463"); grd.addColorStop(1, "#3B2372");
+  g.fillStyle = grd; g.fillRect(0, 0, 1200, 675);
+  const cols = ["#F2C55C", "#F28DA6", "#7FD6C2", "#FFFFFF", "#B9A6FF"];
+  for (let i = 0; i < 80; i++) {
+    const x = rnd() * 1200, y = rnd() * 675;
+    if (x < 790 && y > 110 && y < 620) continue;
+    g.save(); g.translate(x, y); g.rotate(rnd() * Math.PI); g.globalAlpha = .55 + rnd() * .45; g.fillStyle = cols[Math.floor(rnd() * cols.length)];
+    if (rnd() < .5) g.fillRect(-7, -3, 14, 6); else { g.beginPath(); g.arc(0, 0, 4.5, 0, 7); g.fill(); }
+    g.restore();
+  }
+  for (const [bx, by, bc] of [[930, 250, "#F2C55C"], [1040, 200, "#F28DA6"], [1000, 330, "#7FD6C2"]]) {
+    g.strokeStyle = "rgba(255,255,255,.6)"; g.lineWidth = 2; g.beginPath(); g.moveTo(bx, by + 62); g.quadraticCurveTo(bx - 20, by + 160, bx + 10, by + 260); g.stroke();
+    const bg = g.createRadialGradient(bx - 18, by - 22, 4, bx, by, 64); bg.addColorStop(0, "#FFFFFF"); bg.addColorStop(.25, bc); bg.addColorStop(1, bc);
+    g.fillStyle = bg; g.beginPath(); g.ellipse(bx, by, 50, 62, 0, 0, 7); g.fill();
+  }
+  g.strokeStyle = "#E9B04D"; g.lineWidth = 3; g.strokeRect(28, 28, 1144, 619);
+  g.textAlign = "left"; g.textBaseline = "alphabetic";
+  g.fillStyle = "#F2C55C"; g.font = `700 36px ${ZH_SERIF}`; setSp(g, 10); g.fillText("生日快乐", 80, 165); setSp(g, 0);
+  g.fillStyle = "#FFFFFF"; g.font = `800 96px "Bricolage Grotesque", sans-serif`; g.fillText("Happy Birthday", 76, 270);
+  g.fillStyle = "#F2C55C"; fitFont(g, t.nm, 780, 72, 30, `"Bricolage Grotesque", sans-serif`, "800"); g.fillText(t.nm, 78, 370);
+  if (t.company) { g.fillStyle = "#C8CCF0"; fitFont(g, t.company, 760, 30, 16, SANS, "500"); g.fillText(t.company, 80, 420); }
+  g.fillStyle = "#F2C55C"; g.font = `700 28px ${ZH_SERIF}`; setSp(g, 4); g.fillText(t.wish, 80, 530); setSp(g, 0);
+  g.fillStyle = "#FFFFFF"; fitFont(g, t.from, 1040, 24, 14, SANS, "500"); g.fillText(t.from, 80, 590);
+}
+function drawCard(it, W, H){
+  const c = it.c, style = styleFor(it);
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const g = cv.getContext("2d"); g.setTransform(W / 1200, 0, 0, H / 675, 0, 0);
+  let seed = hash(c.name + style) || 1; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+  const elder = it.age != null && it.age >= 55;
+  const t = {nm: nice(c.name), company: c.company, elder, wish: elder ? "福如东海 · 寿比南山" : "身体健康 · 万事如意",
+             from: "With warm wishes from " + signOff(c) + (S.org ? ", " + S.org : "")};
+  ({gold: cardGold, red: cardRed, floral: cardFloral, balloons: cardBalloons}[style] || cardGold)(g, rnd, t);
+  return cv;
+}
+async function cardURL(it, type){
+  await ensureFonts();
+  const key = it.id + "|" + type + "|" + S.org + "|" + signOff(it.c) + "|" + S.tidy + "|" + styleFor(it);
+  if (!imgCache.has(key)) {
+    const cv = drawCard(it, type === "pdf" ? 960 : 1200, type === "pdf" ? 540 : 675);
+    imgCache.set(key, type === "pdf" ? cv.toDataURL("image/jpeg", .86) : cv.toDataURL("image/png"));
+  }
+  return imgCache.get(key);
+}
+
+/* ---------- rendering ---------- */
+function render(){
+  const end = addDays(S.run, S.win - 1);
+  $("#weekLine").textContent = `Week of ${fmtEN(S.run, true)} to ${fmtEN(end, true)} · reminding ${plural(S.lead, "day")} ahead`;
+  $("#demoBanner").hidden = !S.demo;
+  const left = arr => arr.filter(i => !S.sent[i.id]).length;
+  $("#nBday").textContent = left(S.week.bday); $("#nDue").textContent = left(S.week.due); $("#nOver").textContent = left(S.week.over);
+  const nCheck = S.issues.filter(i => i.level !== "info").length; $("#nCheck").textContent = nCheck;
+  document.querySelectorAll(".stat").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tab === S.tab)));
+  document.querySelectorAll("#tabs button").forEach(b => {
+    b.setAttribute("aria-selected", String(b.dataset.tab === S.tab));
+    const n = b.dataset.tab === "check" ? nCheck : S.week[b.dataset.tab].length;
+    b.textContent = {bday:"Birthdays",due:"Premiums due",over:"Overdue",check:"Rows to check"}[b.dataset.tab] + " (" + n + ")";
+  });
+  const asAt = S.meta.asAt ? ` · listing as at ${S.meta.asAt}` : "";
+  if (S.combined && S.cust) {
+    $("#fileCust").textContent = `${S.cust.source} · ${plural(S.cust.body.length, "policy", "policies")} · ${plural(S.customers.length, "customer")}${asAt}`;
+    $("#filePrem").textContent = "Premiums taken from the policy list.";
+  } else {
+    $("#fileCust").textContent = S.cust ? `${S.cust.source} · ${plural(S.customers.length, "customer")} read${asAt}` : "No file loaded";
+    $("#filePrem").textContent = S.prem ? `${S.prem.source} · ${plural(S.premiums.length, "unpaid premium")} read` : "No file loaded";
+  }
+  renderIssues(); renderMap(); renderList();
+  const any = S.week.bday.length + S.week.due.length + S.week.over.length;
+  $("#btnPdf").disabled = !any; $("#btnPreview").disabled = !any;
+}
+function issueHTML(i){
+  return `<div class="issue"><span class="lvl ${i.level}">${i.level === "error" ? "Left out" : i.level === "warn" ? "Check" : "Note"}</span>
+    <div><b>${esc(i.who ? nice(i.who) : i.where)}</b>${i.who ? ` <span class="muted small">${esc(i.where)}</span>` : ""}<br>${esc(i.text)}</div></div>`;
+}
+function renderIssues(){
+  const el = $("#issueList"), order = {error: 0, warn: 1, info: 2};
+  const list = S.issues.slice().sort((a, b) => order[a.level] - order[b.level]);
+  const err = S.issues.filter(i => i.level === "error").length, warn = S.issues.filter(i => i.level === "warn").length;
+  $("#checkSummary").textContent = (S.cust || S.prem) ? `${err} left out · ${plural(warn, "warning")}` : "";
+  if (!S.cust && !S.prem) { el.innerHTML = `<div class="empty">Load a list to see any problems here.</div>`; return; }
+  el.innerHTML = list.length ? list.map(issueHTML).join("") : `<div class="empty">Every row was read cleanly.</div>`;
+}
+function renderMap(){
+  const area = $("#mapArea"); const parts = [];
+  const sets = S.combined ? [["cust", S.cust, "Customer details"], ["prem", S.prem, "Premium details"]] : [["cust", S.cust, "Customer list"], ["prem", S.prem, "Premium list"]];
+  for (const [kind, T, title] of sets) {
+    if (!T) continue;
+    const opts = col => `<option value="">Not in file</option>` + T.header.map((h, i) => `<option value="${i}" ${col === i ? "selected" : ""}>${esc(h || "Column " + (i + 1))}</option>`).join("");
+    parts.push(`<div><h3 style="margin-bottom:8px">${title} <span class="muted small">(${esc(T.source)})</span></h3><div class="fields">` +
+      FIELDS[kind].map(([f, label]) => `<label for="map-${kind}-${f}">${label}${REQUIRED[kind].includes(f) ? " *" : ""}
+        <select id="map-${kind}-${f}" data-kind="${kind}" data-field="${f}">${opts(T.map[f])}</select></label>`).join("") + `</div></div>`);
+  }
+  area.innerHTML = parts.join("") || `<p class="muted small">No files loaded yet.</p>`;
+}
+const inDays = d => d === 0 ? "today" : "in " + plural(d, "day");
+function itemPills(it){
+  const out = [];
+  if (it.type === "bday") out.push(`<span class="pill p-bday">Birthday ${fmtShort(it.ev)} · ${inDays(it.days)}${it.age ? " · turns " + it.age : ""}</span>`);
+  if (it.type === "due") out.push(`<span class="pill p-due">Due ${fmtShort(it.ev)} · ${inDays(it.days)}</span>`);
+  if (it.type === "over") out.push(`<span class="pill p-over">Overdue ${plural(-it.days, "day")} · was due ${fmtEN(it.ev)}</span>`);
+  if (it.type !== "over") {
+    const today = diffDays(S.run, it.remind) === 0;
+    out.push(`<span class="pill ${today ? "p-today" : "p-warn"}">${today ? "Send today" : "Send on " + fmtShort(it.remind)}</span>`);
+  }
+  if (it.p && it.p.match === "name") out.push(`<span class="pill p-warn">Matched by name</span>`);
+  if (it.p && it.p.match === "none") out.push(`<span class="pill p-warn">Not in customer list</span>`);
+  return out.join("");
+}
+function polLines(it){
+  if (!it.ps) return "";
+  const hn = normName(it.c.name);
+  return `<div class="pols">` + it.ps.map(p => `<span>Policy ${esc(p.policy || "no number")}${p.insured && normName(p.insured) !== hn ? " · life assured " + esc(nice(p.insured)) : ""} · ${p.amount != null ? "RM " + money(p.amount) : "no amount"}</span>`).join("") + `</div>`;
+}
+function renderList(){
+  const el = $("#list");
+  if (S.tab === "check") {
+    const list = S.issues.filter(i => i.level !== "info");
+    el.innerHTML = list.length ? list.map(issueHTML).join("") : `<div class="empty">Nothing to check. Every row was read cleanly.</div>`;
+    return;
+  }
+  const all = S.week[S.tab].slice().sort((a, b) => (!!S.sent[a.id]) - (!!S.sent[b.id]));
+  const hiddenNote = S.tab === "over" && S.week.hiddenOver ? `<p class="small muted">${plural(S.week.hiddenOver, "policy", "policies")} overdue by more than ${S.overMax} days ${S.week.hiddenOver === 1 ? "is" : "are"} hidden. These are often investment-linked plans on a premium holiday. Change the limit in Settings.</p>` : "";
+  if (!all.length) {
+    const what = {bday: "birthdays", due: "premiums due", over: "overdue premiums"}[S.tab];
+    el.innerHTML = hiddenNote + `<div class="empty">No ${what} for this week${(!S.cust && !S.prem) ? ". Load your list in step 1" : ""}.</div>`; return;
+  }
+  const items = all.slice(0, S.shown);
+  el.innerHTML = hiddenNote + items.map(it => {
+    const c = it.c, done = !!S.sent[it.id], langs = langsFor(it), cur = S.cardLang[it.id] || S.lang;
+    const ph = phoneOf(c);
+    const contact = [ph ? `<span>${esc(ph.display)}${c.phone ? "" : " (saved on this device)"}</span>` : `<span>No phone in list</span>`, c.email ? `<span>${esc(c.email)}</span>` : "", c.manager ? `<span>Manager: ${esc(c.manager)}</span>` : ""].join("");
+    return `<article class="card ${done ? "done" : ""}" data-id="${esc(it.id)}">
+      <div class="card-head"><div class="who"><h3>${esc(nice(c.name))}</h3><div class="meta">${c.company ? `<span>${esc(c.company)}</span>` : ""}${c.nPol ? `<span>${plural(c.nPol, "policy", "policies")} in list</span>` : ""}</div></div>
+        <div class="pills">${itemPills(it)}</div></div>
+      ${polLines(it)}
+      <div class="meta">${contact}</div>
+      ${it.note ? `<p class="small muted">${esc(it.note)}</p>` : ""}
+      ${it.type === "bday" ? (c.flags || []).map(f => `<p class="flag">${esc(f)}</p>`).join("") : ""}
+      ${it.type === "bday" ? `<img class="cardimg" alt="Birthday card for ${esc(nice(c.name))}" data-img="${esc(it.id)}">
+      <div class="seg" role="group" aria-label="Card style" style="flex-wrap:wrap;align-self:flex-start">${Object.entries(CARD_STYLES).map(([k, v]) => `<button data-act="style" data-style="${k}" aria-pressed="${styleFor(it) === k}">${v.split(" ")[0]}</button>`).join("")}</div>` : ""}
+      <div class="row" style="justify-content:space-between"><span class="eyebrow">Message</span>
+        <div class="seg" role="group" aria-label="Language">${["en","zh","both"].map(l => `<button data-act="lang" data-lang="${l}" aria-pressed="${cur === l}">${{en:"English",zh:"中文",both:"Both 两种"}[l]}</button>`).join("")}</div></div>
+      ${langs.map(l => `<div class="msg"><span class="lang">${LANG_NAME[l]}</span>
+        <textarea id="t-${hash(it.id + l)}" data-act="edit" data-lang="${l}" rows="7" aria-label="${LANG_NAME[l]} message for ${esc(nice(c.name))}">${esc(msgFor(it, l))}</textarea>
+        <div class="row"><button data-act="copy" data-lang="${l}">Copy</button>
+        <button data-act="wa" data-lang="${l}">WhatsApp…</button>
+        ${S.edits[it.id + "|" + l] != null ? `<button class="ghost" data-act="reset" data-lang="${l}">Undo my edits</button>` : ""}</div></div>`).join("")}
+      <div class="row">
+        ${c.email ? `<button class="ghost" data-act="copyemail">Copy email address</button>` : ""}
+        ${it.type === "bday" ? `<button class="ghost" data-act="saveimg">Save card image</button>` : ""}
+        <span style="flex:1"></span>
+        <button class="${done ? "ghost" : "primary"}" data-act="sent">${done ? "Sent ✓ · Undo" : "Mark sent"}</button>
+      </div></article>`;
+  }).join("") + (all.length > items.length ? `<button class="more" id="showMore">Show ${Math.min(40, all.length - items.length)} more of ${all.length - items.length}</button>` : "");
+  el.querySelectorAll("img[data-img]").forEach(async img => {
+    const it = findItem(img.dataset.img); if (it) img.src = await cardURL(it, "png");
+  });
+}
+const cardFileName = it => "birthday-card-" + nice(it.c.name).replace(/[^a-z0-9]+/gi, "-").toLowerCase() + ".png";
+async function cardBlob(it){ return await (await fetch(await cardURL(it, "png"))).blob(); }
+/* Birthday card alongside the greeting: share both where the device allows it, otherwise save or copy the card */
+async function wireCardSend(el, it, text){
+  const img = el.querySelector("#waCard"), share = el.querySelector("#waShare");
+  img.src = await cardURL(it, "png");
+  const blob = await cardBlob(it), file = new File([blob], cardFileName(it), {type: "image/png"});
+  try { if (navigator.canShare && navigator.canShare({files: [file], text})) share.hidden = false; } catch (e) {}
+  share.addEventListener("click", async () => {
+    try { await navigator.share({files: [file], text}); toast("Shared. Pick WhatsApp and the customer, then press Send."); }
+    catch (e) { if (!e || e.name !== "AbortError") { share.hidden = true; toast("Sharing isn't available here. Use Save card instead."); } }
+  });
+  el.querySelector("#waSave").addEventListener("click", () => saveFile(cardFileName(it), blob));
+  el.querySelector("#waCopyImg").addEventListener("click", async () => {
+    try { await navigator.clipboard.write([new ClipboardItem({"image/png": blob})]); toast("Card copied. In WhatsApp, long-press the message box and Paste."); }
+    catch (e) { toast("Copying pictures is blocked here. Use Save card instead."); }
+  });
+}
+function phoneOf(c){ if (c.phone) return c.phone; const s = S.phones[c.key]; if (!s) return null; const p = parsePhone(s); return p.err ? null : p; }
+const findItem = id => [...S.week.bday, ...S.week.due, ...S.week.over].find(i => i.id === id);
+
+/* ---------- UI feedback ---------- */
+let toastT;
+function toast(msg){ let t = $(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); } t.textContent = msg; clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2800); }
+function sheet(html, onMount){
+  const scrim = document.createElement("div"); scrim.className = "scrim";
+  scrim.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
+  const close = () => { scrim.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = e => { if (e.key === "Escape") close(); };
+  scrim.addEventListener("click", e => { if (e.target === scrim || e.target.closest("[data-close]")) close(); });
+  document.addEventListener("keydown", onKey);
+  document.body.appendChild(scrim); onMount && onMount(scrim.querySelector(".sheet"), close);
+  const f = scrim.querySelector("textarea,button,a"); f && f.focus();
+  return close;
+}
+async function copyText(text, ta){
+  try { await navigator.clipboard.writeText(text); toast("Copied. Paste it into WhatsApp, SMS or email."); }
+  catch (e) { if (ta) { ta.focus(); ta.select(); } toast("Copy was blocked here. The text is selected, so use your keyboard's Copy."); }
+}
+
+/* ---------- card actions ---------- */
+$("#list").addEventListener("click", async e => {
+  if (e.target.id === "showMore") { S.shown += 40; renderList(); return; }
+  const b = e.target.closest("button[data-act]"); if (!b) return;
+  const card = b.closest(".card"); const it = findItem(card.dataset.id); if (!it) return;
+  const lang = b.dataset.lang, act = b.dataset.act;
+  if (act === "lang") { S.cardLang[it.id] = lang; renderList(); return; }
+  if (act === "style") { S.cardStyleFor[it.id] = b.dataset.style; renderList(); return; }
+  if (act === "copy") { copyText(msgFor(it, lang), card.querySelector(`textarea[data-lang="${lang}"]`)); return; }
+  if (act === "reset") { delete S.edits[it.id + "|" + lang]; renderList(); return; }
+  if (act === "copyemail") { copyText(it.c.email); return; }
+  if (act === "sent") {
+    if (S.sent[it.id]) delete S.sent[it.id]; else S.sent[it.id] = iso(new Date());
+    store.set("sent", S.sent); render(); toast(S.sent[it.id] ? "Marked as sent." : "Moved back to not sent."); return;
+  }
+  if (act === "saveimg") { const url = await cardURL(it, "png"); const blob = await (await fetch(url)).blob(); saveFile("birthday-card-" + nice(it.c.name).replace(/[^a-z0-9]+/gi, "-").toLowerCase() + ".png", blob); return; }
+  if (act === "wa") {
+    const text = msgFor(it, lang), known = phoneOf(it.c), fromList = !!it.c.phone;
+    sheet(`<h2>Send on WhatsApp?</h2>
+      <p>To <b>${esc(nice(it.c.name))}</b></p>
+      <div class="fields"><label for="waPhone">Phone number ${fromList ? "(from your list)" : "(optional)"}
+        <input type="text" id="waPhone" inputmode="tel" placeholder="e.g. 012-345 6789" value="${esc(known ? known.display : "")}" ${fromList ? "readonly" : ""}></label></div>
+      <p class="small muted" id="waHint"></p>
+      <pre>${esc(text)}</pre>
+      ${it.type === "bday" ? `<div class="msg"><span class="lang">生日卡 Birthday card</span>
+        <img class="cardimg" id="waCard" alt="Birthday card for ${esc(nice(it.c.name))}">
+        <div class="row"><button class="primary" id="waShare" hidden>一起分享卡片和祝福 Share card + message</button>
+          <button id="waSave">① 保存卡片 Save card</button><button id="waCopyImg">复制卡片 Copy card</button></div>
+        <p class="small muted">WhatsApp links can only carry text. So: ① save the card, ② open WhatsApp and send the greeting, ③ tap 📎 → Gallery and send the card.<br>WhatsApp 链接只能带文字：① 保存卡片 ② 打开 WhatsApp 发出祝福 ③ 按 📎 → 相册，选这张卡片发送。</p></div>` : ""}
+      <p class="small muted">WhatsApp opens with this message filled in. Nothing is sent until you press Send in WhatsApp. If WhatsApp doesn't open, use Copy instead.</p>
+      <div class="row" style="justify-content:flex-end"><button data-close>Cancel</button>
+      <a class="btn primary" id="waGo" href="#" target="_blank" rel="noopener">${it.type === "bday" ? "② " : ""}Open WhatsApp</a></div>`, (el, close) => {
+      const inp = el.querySelector("#waPhone"), go = el.querySelector("#waGo"), hint = el.querySelector("#waHint");
+      if (it.type === "bday") wireCardSend(el, it, text);
+      let num = null;
+      const update = () => {
+        const v = inp.value.trim(), p = v ? parsePhone(v) : null;
+        num = p && !p.err ? p : null;
+        const bad = v && !num;
+        go.href = "https://wa.me/" + (num ? num.wa : "") + "?text=" + encodeURIComponent(text);
+        go.style.pointerEvents = bad ? "none" : ""; go.style.opacity = bad ? ".45" : "";
+        hint.textContent = bad ? "This number looks incomplete. Check it, or clear it to pick the chat in WhatsApp."
+          : num ? `Opens the chat with ${num.display}.` : "No number: WhatsApp opens and you choose the customer's chat.";
+      };
+      inp.addEventListener("input", update); update();
+      go.addEventListener("click", () => {
+        if (num && !fromList) { S.phones[it.c.key] = inp.value.trim(); store.set("phones", S.phones); }
+        else if (!inp.value.trim() && S.phones[it.c.key]) { delete S.phones[it.c.key]; store.set("phones", S.phones); }
+        setTimeout(() => { close(); renderList(); }, 50);
+      });
+    });
+  }
+});
+$("#list").addEventListener("input", e => {
+  const ta = e.target.closest("textarea[data-act=edit]"); if (!ta) return;
+  const it = findItem(ta.closest(".card").dataset.id); if (it) S.edits[it.id + "|" + ta.dataset.lang] = ta.value;
+});
+$("#list").addEventListener("change", e => { if (e.target.closest("textarea[data-act=edit]")) renderList(); });
+
+/* ---------- saving files ---------- */
+let dl = null; const dlReady = (async () => { try { dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null; } catch (e) { dl = null; } })();
+async function saveFile(filename, data){
+  await dlReady;
+  if (dl) {
+    try { await dl.save({filename, data}); toast("Saved " + filename); return true; }
+    catch (e) {
+      const code = e && e.code;
+      toast(code === "declined" ? "Save cancelled." : code === "rate_limited" ? "A save is already waiting for you. Finish that first." : "Couldn't save the file here.");
+      return false;
+    }
+  }
+  try {
+    const blob = data instanceof Blob ? data : new Blob([data]);
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast("Saved " + filename); return true;
+  } catch (e) { toast("Saving files isn't available in this view."); return false; }
+}
+
+/* ---------- PDF ---------- */
+const pdfSafe = s => String(s ?? "").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-").replace(/[^\u0000-ÿ\n]/g, "?");
+async function buildPdf(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit: "mm", format: "a4"});
+  const W = 210, M = 14, CW = W - 2 * M, BOTTOM = 280;
+  let y = 0;
+  const INK = [26, 32, 66], MUTED = [91, 97, 133], BRAND = [40, 49, 124], GOLD = [185, 124, 18], RED = [179, 38, 30];
+  const end = addDays(S.run, S.win - 1);
+  doc.setFillColor(...BRAND); doc.rect(0, 0, W, 34, "F");
+  doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(19);
+  doc.text("Birthday & Premium Reminders", M, 15);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+  doc.text(pdfSafe(`Week of ${fmtEN(S.run, true)} to ${fmtEN(end, true)}  |  remind ${S.lead} days ahead${S.meta.asAt ? "  |  listing as at " + S.meta.asAt : ""}`), M, 23);
+  const nB = S.week.bday.length, nD = S.week.due.length, nO = S.week.over.length;
+  doc.text(`${plural(nB, "birthday")}  |  ${plural(nD, "premium reminder")} due soon  |  ${nO} overdue  |  made ${fmtEN(todayLocal())}${S.sign ? "  |  " + pdfSafe(S.sign) : ""}`, M, 29);
+  y = 44;
+  const need = h => { if (y + h > BOTTOM) { doc.addPage(); y = 18; } };
+  const msgBlock = (it, x, w) => {
+    for (const l of langsFor(it)) {
+      if (l === "zh") {
+        const img = zhImage(msgFor(it, l), w - 6), h = 7 + img.h + 2;
+        need(h + 2);
+        doc.setFillColor(242, 243, 248); doc.roundedRect(x, y, w, h, 2, 2, "F");
+        doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+        doc.text("CHINESE  (to copy this text, use Copy in the app)", x + 3, y + 4.5);
+        doc.addImage(img.url, "JPEG", x + 3, y + 6.5, w - 6, img.h);
+        y += h + 3; continue;
+      }
+      doc.setFont("helvetica", "normal").setFontSize(9.5);
+      const lines = doc.splitTextToSize(pdfSafe(msgFor(it, l)), w - 6);
+      const h = 6 + lines.length * 4.25 + 3;
+      need(h + 2);
+      doc.setFillColor(242, 243, 248); doc.roundedRect(x, y, w, h, 2, 2, "F");
+      doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+      doc.text("ENGLISH", x + 3, y + 4.5);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...INK);
+      doc.text(lines, x + 3, y + 9.5, {lineHeightFactor: 1.28});
+      y += h + 3;
+    }
+  };
+  const section = (title, color, count, sub) => {
+    need(18); doc.setFont("helvetica", "bold"); doc.setFontSize(13.5); doc.setTextColor(...color);
+    doc.text(`${title} (${count})`, M, y); doc.setDrawColor(...color); doc.setLineWidth(.5); doc.line(M, y + 2, W - M, y + 2); y += 7;
+    if (sub) { doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(...MUTED); doc.text(sub, M, y); y += 5; } else y += 2;
+  };
+  const detail = (pairs, x, w) => {
+    let yy = y;
+    for (const [k, v] of pairs) {
+      if (!v) continue;
+      doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(...MUTED); doc.text(k.toUpperCase(), x, yy);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...INK);
+      const lines = doc.splitTextToSize(pdfSafe(v), w); doc.text(lines, x, yy + 4); yy += 4 + lines.length * 4.1 + 1.6;
+    }
+    return yy - y;
+  };
+  const title = (it) => { doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(...INK); doc.text(pdfSafe(nice(it.c.name)) + (S.sent[it.id] ? "   [sent]" : ""), M, y); y += 4; };
+  if (nB) {
+    section("Birthdays", GOLD, nB, "Copy the message, then attach the card image (also in the app: Save card image).");
+    for (const it of S.week.bday) {
+      const c = it.c, imgW = 64, imgH = 36;
+      need(imgH + 26); title(it);
+      doc.addImage(await cardURL(it, "pdf"), "JPEG", M, y, imgW, imgH);
+      const h = detail([["Birthday", `${fmtEN(it.ev, true)} (${inDays(it.days)})${it.age ? ", turns " + it.age : ""}`],
+        ["Send on", fmtEN(it.remind, true)], ["Company", c.company], ["Phone", c.phone ? c.phone.display : "Not in list"],
+        ["Email", c.email], ["Check first", (c.flags || []).join(" ")]], M + imgW + 6, CW - imgW - 6);
+      y += Math.max(imgH, h) + 3;
+      msgBlock(it, M, CW); y += 4;
+    }
+  }
+  const premSection = (name, color, list, sub) => {
+    if (!list.length) return;
+    y += 2; section(name, color, list.length, sub);
+    for (const it of list) {
+      const c = it.c;
+      need(34); title(it); y += 1;
+      const half = (CW - 6) / 2, hn = normName(c.name);
+      const pols = it.ps.map(p => `${p.policy || "no number"}${p.insured && normName(p.insured) !== hn ? " (" + nice(p.insured) + ")" : ""}: ${p.amount != null ? "RM " + money(p.amount) : "no amount"}`).join("\n");
+      const h1 = detail([[it.type === "over" ? "Was due" : "Due date", `${fmtEN(it.ev, true)} (${it.days < 0 ? plural(-it.days, "day") + " overdue" : inDays(it.days)})`],
+        [it.ps.length > 1 ? "Policies" : "Policy", pols]], M, half);
+      const h2 = detail([["Send on", it.type === "over" ? "As soon as possible" : fmtEN(it.remind, true)], ["Phone", c.phone ? c.phone.display : "Not in list"], ["Email", c.email]], M + half + 6, half);
+      y += Math.max(h1, h2) + 1;
+      msgBlock(it, M, CW); y += 4;
+    }
+  };
+  premSection("Premiums due soon", BRAND, S.week.due);
+  premSection("Overdue premiums", RED, S.week.over, `Most recent first, up to ${S.overMax} days overdue${S.week.hiddenOver ? ` (${S.week.hiddenOver} older not shown)` : ""}. Check the latest payment in your system before sending.`);
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) {
+    doc.setPage(i); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...MUTED);
+    doc.text("Confidential: contains customer data. Do not forward.", M, 290); doc.text(`Page ${i} of ${n}`, W - M, 290, {align: "right"});
+  }
+  return doc.output("blob");
+}
+async function previewPdf(blob){
+  sheet(`<div class="row" style="justify-content:space-between"><h2>PDF preview</h2><button data-close>Close</button></div><div class="pdfpages" id="pdfPages"><p class="muted">Drawing pages…</p></div>`);
+  try {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    const pdf = await pdfjsLib.getDocument({data: new Uint8Array(await blob.arrayBuffer())}).promise;
+    const host = $("#pdfPages"); host.innerHTML = "";
+    for (let i = 1; i <= Math.min(pdf.numPages, 12); i++) {
+      const page = await pdf.getPage(i), vp = page.getViewport({scale: 1.6});
+      const cv = document.createElement("canvas"); cv.width = vp.width; cv.height = vp.height; host.appendChild(cv);
+      await page.render({canvasContext: cv.getContext("2d"), viewport: vp}).promise;
+    }
+    if (pdf.numPages > 12) host.insertAdjacentHTML("beforeend", `<p class="muted small">Showing 12 of ${pdf.numPages} pages. Download the PDF to see all.</p>`);
+  } catch (e) { const h = $("#pdfPages"); if (h) h.innerHTML = `<p>Preview couldn't be drawn here. Use Download PDF instead.</p>`; }
+}
+$("#btnPdf").addEventListener("click", async e => {
+  const b = e.currentTarget; b.disabled = true; const t = b.textContent; b.textContent = "Making PDF…";
+  try { const blob = await buildPdf(); window.__lastPdf = blob; await saveFile(`birthday-premium-reminders-${iso(S.run)}.pdf`, blob); }
+  catch (err) { toast("Couldn't make the PDF. " + (err && err.message || "")); }
+  b.disabled = false; b.textContent = t;
+});
+$("#btnPreview").addEventListener("click", async () => { try { const blob = await buildPdf(); window.__lastPdf = blob; previewPdf(blob); } catch (err) { toast("Couldn't make the PDF."); } });
+
+/* ---------- PDF reading ---------- */
+/* Split a text run that the PDF glued together (e.g. "1001080128168TAN CHIOW HUI" or "09/01/202709/11/2026") into pieces with estimated x positions */
+function splitItem(it){
+  if (!it.str.trim()) return [];
+  const marked = it.str
+    .replace(/^(\s*)(\d{1,3})(\d{10})(?!\d)/, (m, a, b, c) => a + b + "\u0001" + c)
+    .replace(/(\d{2}\/\d{2}\/\d{4})/g, "\u0001$1\u0001")
+    .replace(/(\d{10})(?=[A-Za-z])/g, "$1\u0001");
+  const parts = []; let pos = 0, cur = "", start = 0;
+  for (const ch of marked) {
+    if (ch === "\u0001") { if (cur.trim()) parts.push({s: cur.trim(), a: start, b: pos}); cur = ""; start = pos; }
+    else { cur += ch; pos++; }
+  }
+  if (cur.trim()) parts.push({s: cur.trim(), a: start, b: pos});
+  const n = pos || 1;
+  return parts.map(p => ({s: p.s, x: it.x + it.w * p.a / n, w: it.w * (p.b - p.a) / n, y: it.y}));
+}
+const NOISE = /^\d{1,2}\/\d{1,2}\/\d{2},|CUSTOMER SERVICE|^https?:|epartner|^\d+\/\d+$|records|Previous|Back to|BACK TO MAIN|Click here|Policy Listing|^Notes|Please view|There are a total|Agent N/i;
+function parsePolicyListing(pages){
+  let cols = null, last = null; const recs = [];
+  for (const items of pages) {
+    let headerY = null;
+    const dob = items.find(i => i.str.trim() === "DOB");
+    if (dob) {
+      const line = items.filter(i => Math.abs(i.y - dob.y) < 2).sort((a, b) => a.x - b.x);
+      const c = {}; let prem = 0, pay = 0;
+      for (const m of line) {
+        const s = m.str.replace(/\s+/g, " ").trim(), cx = m.x + m.w / 2;
+        if (/^No\.?$/i.test(s)) c.no = cx; else if (/Policy\s*No/i.test(s)) c.policy = cx; else if (/Policy\s*Holder/i.test(s)) c.holder = cx;
+        else if (/^DOB$/i.test(s)) c.dob = cx; else if (/Life\s*Assured/i.test(s)) c.insured = cx; else if (/Commencement/i.test(s)) c.commence = cx;
+        else if (/^Premium/i.test(s)) { if (prem++ === 0) c.due = cx; else c.amount = cx; }
+        else if (/^Last/i.test(s)) c.last = cx;
+        else if (/^Payment/i.test(s)) { if (pay++ === 0) c.mode = cx; else c.method = cx; }
+        else if (/^Plan/i.test(s)) c.plan = cx; else if (/^Status/i.test(s)) c.status = cx; else if (/^GJA/i.test(s)) c.gja = cx; else if (/ISSUING/i.test(s)) c.issuing = cx;
+      }
+      if (c.policy != null && c.holder != null && c.due != null && c.dob != null) { cols = Object.entries(c).sort((a, b) => a[1] - b[1]); headerY = dob.y; }
+    }
+    if (!cols) return null;
+    const colOf = x => { let best = cols[0][0], bd = Infinity; for (const [k, cx] of cols) { const d = Math.abs(x - cx); if (d < bd) { bd = d; best = k; } } return best; };
+    const pieces = items.flatMap(splitItem).filter(p => !NOISE.test(p.s) && (headerY == null || p.y < headerY - 1));
+    const anchors = pieces.filter(p => /^\d{10}$/.test(p.s) && colOf(p.x + p.w / 2) === "policy").sort((a, b) => b.y - a.y);
+    const pageRecs = anchors.map(a => ({cells: {policy: [a]}}));
+    for (const p of pieces) {
+      if (anchors.includes(p)) continue;
+      let rec = null;
+      for (let i = 0; i < anchors.length; i++) { if (p.y <= anchors[i].y + 2) rec = pageRecs[i]; else break; }
+      if (!rec) { if (headerY != null) continue; rec = last; }
+      if (!rec) continue;
+      const col = colOf(p.x + p.w / 2); (rec.cells[col] = rec.cells[col] || []).push(p);
+    }
+    recs.push(...pageRecs);
+    if (pageRecs.length) last = pageRecs[pageRecs.length - 1];
+  }
+  if (!recs.length) return null;
+  const header = ["No.","Policy No.","Policy Holder","DOB","Life Assured","Commencement Date","Premium Due Date","Last Payment Date","Premium Amount","Payment Mode","Payment Method","Plan Type","Status"];
+  const keys = ["no","policy","holder","dob","insured","commence","due","last","amount","mode","method","plan","status"];
+  const join = arr => (arr || []).slice().sort((a, b) => (Math.round(b.y) - Math.round(a.y)) || (a.x - b.x)).map(p => p.s).join(" ").replace(/\s+/g, " ").trim();
+  return [header, ...recs.map(r => keys.map(k => {
+    let v = join(r.cells[k]);
+    if (["dob","commence","due","last"].includes(k)) { const m = v.match(/\d{2}\/\d{2}\/\d{4}/); v = m ? m[0] : ""; }
+    if (k === "amount") { const m = v.match(/\d[\d,]*\.\d{2}/); v = m ? m[0] : ""; }
+    if (k === "no") { const m = v.match(/\d+/); v = m ? m[0] : ""; }
+    return v;
+  }))];
+}
+function genericLines(pages){
+  const rows = [];
+  for (const items of pages) {
+    const its = items.slice().sort((a, b) => b.y - a.y || a.x - b.x), lines = [];
+    for (const it of its) { const L = lines.find(l => Math.abs(l.y - it.y) < it.h * .5); if (L) L.items.push(it); else lines.push({y: it.y, items: [it]}); }
+    for (const L of lines) {
+      L.items.sort((a, b) => a.x - b.x); const cells = []; let cur = null;
+      for (const it of L.items) { if (cur && it.x - (cur.x + cur.w) < it.h * .9) { cur.s += (it.x - (cur.x + cur.w) > it.h * .15 ? " " : "") + it.str; cur.w = it.x + it.w - cur.x; } else { cur = {s: it.str, x: it.x, w: it.w}; cells.push(cur); } }
+      rows.push(cells.map(c => c.s.trim()));
+    }
+  }
+  return rows;
+}
+async function pdfRead(buf){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const pdf = await pdfjsLib.getDocument({data: new Uint8Array(buf)}).promise;
+  const pages = []; let full = "";
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const tc = await (await pdf.getPage(p)).getTextContent();
+    const items = tc.items.filter(i => i.str && i.str.trim()).map(i => ({str: i.str, x: i.transform[4], y: i.transform[5], w: i.width || 0, h: Math.abs(i.transform[3]) || 8}));
+    pages.push(items); full += items.map(i => i.str).join(" ") + "\n";
+  }
+  const meta = {};
+  const ag = full.match(/Agent Name:\s*([A-Za-z][A-Za-z .'\/@-]*?)\s+Agent No/i); if (ag) meta.agent = ag[1].trim();
+  const at = full.match(/as at\s+(\d{1,2}\/\d{1,2}\/\d{4})/i); if (at) meta.asAt = at[1];
+  const listing = parsePolicyListing(pages);
+  return {rows: listing || genericLines(pages), meta, how: "pdf"};
+}
+
+/* ---------- file loading ---------- */
+async function readOne(file){
+  const name = file.name, ext = (name.split(".").pop() || "").toLowerCase();
+  if (/^(png|jpe?g|heic|webp|gif)$/.test(ext) || (file.type || "").startsWith("image/")) return {image: true, name};
+  const buf = await file.arrayBuffer();
+  if (ext === "pdf") return Object.assign(await pdfRead(buf), {name});
+  const wb = XLSX.read(buf, {type: "array"});
+  let best = null;
+  for (const sn of wb.SheetNames) {
+    const r = XLSX.utils.sheet_to_json(wb.Sheets[sn], {header: 1, raw: true, defval: ""});
+    const h = findHeader(r); if (h && (!best || h.n > best.n)) best = {r, n: h.n};
+  }
+  return {rows: best ? best.r : XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: true, defval: ""}), meta: {}, how: "excel", name};
+}
+async function readFiles(files, slot){
+  const results = [];
+  for (const f of files) {
+    try { results.push(await readOne(f)); }
+    catch (e) { toast(`Couldn't open ${f.name}. Is it an Excel, CSV or PDF file?`); return; }
+  }
+  if (results.some(r => r.image)) {
+    sheet(`<h2>Photos can't be read safely here</h2>
+      <p>Reading a picture of a list can mix up digits in dates and phone numbers, so this page doesn't try.</p>
+      <p><b>Quick way on your phone:</b> open the image, press and hold the text (iPhone Live Text or Google Lens), choose <b>Copy</b>, then use <b>Paste rows</b> here. You'll see every row before anything is used.</p>
+      <p class="small muted">Best of all: download the list as PDF or export it as Excel or CSV.</p>
+      <div class="row" style="justify-content:flex-end"><button data-close>OK</button></div>`);
+    if (results.every(r => r.image)) return;
+  }
+  const good = results.filter(r => !r.image);
+  let T = null; const meta = {};
+  for (const r of good) {
+    const t = tableFrom(r.rows, r.name, r.how);
+    if (!t) { noHeader(r.name, slot); return; }
+    Object.assign(meta, r.meta);
+    if (!T) T = t;
+    else if (t.header.length === T.header.length && t.header.every((h, i) => normHead(h) === normHead(T.header[i]))) { T.body.push(...t.body); T.source += " + " + t.source; }
+    else { sheet(`<h2>These files have different columns</h2><p><b>${esc(t.source)}</b> doesn't have the same column headings as <b>${esc(T.source)}</b>. Load them one at a time, or into different boxes.</p><div class="row" style="justify-content:flex-end"><button data-close>OK</button></div>`); return; }
+  }
+  if (T) useTable(T, slot, meta);
+}
+function noHeader(source, slot){
+  sheet(`<h2>No column headings found</h2><p>We couldn't find headings like <b>${slot === "cust" ? "Name, Birthday, Phone" : "Policy No, Due Date, Amount"}</b> in <b>${esc(source)}</b>.</p><p class="small muted">Make sure the list has a row of column names. The blank templates show the layout.</p><div class="row" style="justify-content:flex-end"><button data-close>OK</button></div>`);
+}
+function useTable(T, slot, meta){
+  if (S.demo) { S.demo = false; S.cust = null; S.prem = null; S.combined = false; S.meta = {}; S.sent = store.get("sent", {}); }
+  const cm = detectMap(T.header, "cust"), pm = detectMap(T.header, "prem");
+  const combined = cm.birthday != null && pm.due != null;
+  if (combined) { S.cust = Object.assign({}, T, {map: cm}); S.prem = Object.assign({}, T, {map: pm}); S.combined = true; }
+  else {
+    if (S.combined) { S.combined = false; if (slot === "cust") S.prem = null; else S.cust = null; }
+    if (slot === "cust") S.cust = Object.assign({}, T, {map: cm}); else S.prem = Object.assign({}, T, {map: pm});
+  }
+  S.meta = Object.assign({}, meta);
+  if (meta.agent && !S.sign) { S.sign = titleCase(meta.agent); store.set("sign", S.sign); syncSettings(); }
+  S.edits = {}; S.shown = 40; imgCache.clear();
+  processAll();
+  if (T.how !== "excel") S.issues.unshift({level: "warn", where: T.source, who: "", text: `Read from ${T.how === "pdf" ? "a PDF" : "pasted text"}. Spot-check a few names, dates and amounts against the original before sending.`});
+  pickDefaultTab(); render();
+  toast(combined ? `${plural(T.body.length, "policy", "policies")} loaded for ${plural(S.customers.length, "customer")}.` : slot === "cust" ? `${plural(S.customers.length, "customer")} loaded.` : `${plural(S.premiums.length, "unpaid premium")} loaded.`);
+}
+function bindDrop(zone, input, slot){
+  input.addEventListener("change", () => { if (input.files.length) readFiles([...input.files], slot); input.value = ""; });
+  zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("over"); });
+  zone.addEventListener("dragleave", () => zone.classList.remove("over"));
+  zone.addEventListener("drop", e => { e.preventDefault(); zone.classList.remove("over"); if (e.dataTransfer.files.length) readFiles([...e.dataTransfer.files], slot); });
+}
+bindDrop($("#dropCust"), $("#inCust"), "cust");
+bindDrop($("#dropPrem"), $("#inPrem"), "prem");
+document.querySelectorAll("[data-paste]").forEach(b => b.addEventListener("click", () => {
+  const slot = b.dataset.paste;
+  sheet(`<h2>Paste ${slot === "cust" ? "customer" : "premium"} rows</h2>
+    <p class="small muted">Copy rows from Excel, Google Sheets, or text copied from a photo. Include the heading row. One customer per line; columns separated by tabs, commas or a | sign.</p>
+    <textarea id="pasteBox" rows="9" aria-label="Rows to paste" placeholder="${slot === "cust" ? "Name	Company	Birthday	Phone	Email	Account Manager" : "Customer ID	Name	Phone	Policy No	Premium Amount	Due Date	Status"}"></textarea>
+    <div class="row" style="justify-content:flex-end"><button data-close>Cancel</button><button class="primary" id="pasteGo">Read these rows</button></div>`,
+    (el, close) => el.querySelector("#pasteGo").addEventListener("click", () => {
+      const text = el.querySelector("#pasteBox").value.trim(); if (!text) return;
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      const sep = lines[0].includes("\t") ? /\t/ : lines[0].includes("|") ? /\s*\|\s*/ : lines[0].includes(",") ? /\s*,\s*/ : /\s{2,}/;
+      close();
+      const T = tableFrom(lines.map(l => l.split(sep)), "Pasted rows", "paste");
+      if (!T) noHeader("the pasted rows", slot); else useTable(T, slot, {});
+    }));
+}));
+$("#mapArea").addEventListener("change", e => {
+  const s = e.target.closest("select[data-field]"); if (!s) return;
+  const T = s.dataset.kind === "cust" ? S.cust : S.prem; const v = s.value === "" ? null : +s.value;
+  for (const f in T.map) if (T.map[f] === v && f !== s.dataset.field && v != null) delete T.map[f];
+  if (v == null) delete T.map[s.dataset.field]; else T.map[s.dataset.field] = v;
+  processAll(); render(); $("#mapBox").open = true;
+});
+
+/* ---------- templates ---------- */
+$("#btnTemplates").addEventListener("click", () => {
+  sheet(`<h2>Blank templates</h2><p>Fill these in, or export from your system with the same column names. Dates like 25/12/1985 are fine. A policy listing PDF doesn't need a template.</p>
+    <div class="row"><button class="primary" id="tCust">Customer list (.xlsx)</button><button class="primary" id="tPrem">Premium list (.xlsx)</button></div>
+    <div class="row" style="justify-content:flex-end"><button data-close>Close</button></div>`, el => {
+    const mkBook = aoa => { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(aoa); ws["!cols"] = aoa[0].map(() => ({wch: 22})); XLSX.utils.book_append_sheet(wb, ws, "List"); return XLSX.write(wb, {type: "array", bookType: "xlsx"}); };
+    el.querySelector("#tCust").addEventListener("click", () => saveFile("customer-list-template.xlsx", mkBook([["Customer ID","Name","Company","Birthday","Phone","Email","Account Manager"],["C001","Example Name","Example Sdn Bhd","25/12/1985","012-345 6789","name@example.com","Your Name"]])));
+    el.querySelector("#tPrem").addEventListener("click", () => saveFile("premium-list-template.xlsx", mkBook([["Customer ID","Name","Phone","Policy No","Premium Amount","Due Date","Status"],["C001","Example Name","012-345 6789","POL-000123","1250.00","30/11/2026","Unpaid"]])));
+  });
+});
+
+/* ---------- settings ---------- */
+function syncSettings(){
+  $("#setRun").value = iso(S.run); $("#setLead").value = S.lead; $("#setWin").value = S.win; $("#setTidy").checked = !!S.tidy; $("#setOver").value = S.overMax; $("#setStyle").value = S.cardStyle;
+  $("#setOrder").value = S.order; $("#setLang").value = S.lang; $("#setOrg").value = S.org; $("#setSign").value = S.sign;
+}
+$("#settingsBox").addEventListener("change", e => {
+  const id = e.target.id;
+  if (id === "setRun" && e.target.value) { const [y, m, d] = e.target.value.split("-").map(Number); S.run = mk(y, m, d); if (S.demo) loadDemo(); }
+  if (id === "setLead") S.lead = Math.max(0, Math.min(14, +e.target.value || 0));
+  if (id === "setWin") S.win = Math.max(1, Math.min(31, +e.target.value || 7));
+  if (id === "setOrder") S.order = e.target.value;
+  if (id === "setLang") { S.lang = e.target.value; S.cardLang = {}; }
+  if (id === "setOrg") S.org = e.target.value;
+  if (id === "setSign") S.sign = e.target.value;
+  if (id === "setTidy") S.tidy = e.target.checked;
+  if (id === "setOver") S.overMax = Math.max(1, Math.min(3650, +e.target.value || 90));
+  if (id === "setStyle") { S.cardStyle = e.target.value; S.cardStyleFor = {}; }
+  ["lead","win","order","lang","org","sign","tidy","overMax","cardStyle"].forEach(k => store.set(k, S[k]));
+  imgCache.clear(); processAll(); render();
+});
+
+/* ---------- tabs ---------- */
+document.querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", () => {
+  S.tab = b.dataset.tab; S.shown = 40; render();
+  if (b.classList.contains("stat")) $("#sendPanel").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start"});
+}));
+function pickDefaultTab(){ S.tab = S.week.bday.length ? "bday" : S.week.due.length ? "due" : S.week.over.length ? "over" : "bday"; }
+
+/* ---------- example data (made up) ---------- */
+function loadDemo(){
+  const r = S.run, f = (dt, yr) => String(dt.getDate()).padStart(2, "0") + "/" + String(dt.getMonth() + 1).padStart(2, "0") + "/" + (yr ?? dt.getFullYear());
+  const b = (n, yr) => f(addDays(r, n), yr);
+  const cust = [
+    ["Customer ID","Name","Company","Birthday","Phone","Email","Account Manager"],
+    ["C001","Nur Aisyah binti Rahman","Seri Kenanga Logistics Sdn Bhd", b(3, 1988), "012-555 0142","aisyah.rahman@example.com","Farhan Ismail"],
+    ["C002","Tan Wei Ming","Hartamas Foods Sdn Bhd", b(5, 1979), "016 555 0178","weiming.tan@example.com","Michelle Wong"],
+    ["C003","Rajesh a/l Subramaniam","Bayu Tech Solutions", b(8, 1991), "+60 17-555 0193","rajesh.s@example","Farhan Ismail"],
+    ["C004","Siti Hajar binti Osman","Teratai Medical Centre", "", "019-555 0110","siti.hajar@example.com","Michelle Wong"],
+    ["C005","LEE CHONG HAN","Gemilang Trading", "31/02/1980", "012-555 0166","","Michelle Wong"],
+    ["C006","Ahmad Faizal bin Yusof","Lim & Partners Architects", b(40, 1985), "12 345","faizal@example.com","Farhan Ismail"],
+    ["C002","Tan Wei Ming","Hartamas Foods Sdn Bhd", b(5, 1979), "016 555 0178","weiming.tan@example.com","Michelle Wong"]
+  ];
+  const prem = [
+    ["Customer ID","Name","Phone","Policy No","Premium Amount","Due Date","Status"],
+    ["C001","Nur Aisyah binti Rahman","","PL-20418","RM 1,250.00", b(3),"Unpaid"],
+    ["","Rajesh Subramaniam","017-555 0193","PL-20977","860.5", b(6),"Unpaid"],
+    ["","Tan Wei Ming","","PL-19033","2,400.00", b(-12),"Unpaid"],
+    ["","Kumar Holdings (Mr Kumar)","013-555 0127","PL-18820","540.00", b(-5),"Unpaid"],
+    ["C004","Siti Hajar binti Osman","","PL-20101","720.00", b(2),"Paid"],
+    ["C005","Lee Chong Han","","PL-20555","990.00","","Unpaid"]
+  ];
+  const tc = tableFrom(cust, "example-customers.xlsx", "excel"), tp = tableFrom(prem, "example-premiums.xlsx", "excel");
+  S.cust = Object.assign(tc, {map: detectMap(tc.header, "cust")});
+  S.prem = Object.assign(tp, {map: detectMap(tp.header, "prem")});
+  S.combined = false; S.meta = {}; S.demo = true; S.sent = {}; S.edits = {}; imgCache.clear();
+  processAll(); pickDefaultTab();
+}
+$("#clearDemo").addEventListener("click", () => {
+  S.demo = false; S.cust = null; S.prem = null; S.combined = false; S.sent = store.get("sent", {}); processAll(); render();
+});
+
+/* ---------- start ---------- */
+syncSettings(); loadDemo(); render();
+window.__app = {S, cardURL, loadDemo, processAll, render, buildPdf, previewPdf, parseDate, parsePhone, readFiles, pdfRead, useTable, tableFrom};
+})();
+</script>
+
+</body></html>
