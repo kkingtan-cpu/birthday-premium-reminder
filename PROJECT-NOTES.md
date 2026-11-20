@@ -53,3 +53,4 @@ This file is the project's memory: what was built, why, and what was decided. Ad
 - 2026-11-21: Installable on Android and iPhone home screens: app icon (calendar, cake and RM coin), manifest, Install app button.
 - 2026-11-21: Install poster with QR code for the team (share/install-poster.png, share/qr-code.png).
 - 2026-11-21: Branded QR code (share/qr-designed.png; share/qr-code.png now has the icon in the centre). Verified to decode.
+- 2026-11-21: Upload box explains where to get the list: download all policies from Online Inquiry as PDF.
