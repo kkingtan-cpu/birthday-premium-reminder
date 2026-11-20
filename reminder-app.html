@@ -65,8 +65,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .stat.s-over b{color:var(--bad)}
 .stat.s-check b{color:var(--warn)}
 
-.drops{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:600px){.drops{grid-template-columns:1fr}}
+.drops{display:grid;grid-template-columns:1fr;gap:12px}
 .drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--sunk);min-width:0}
 .drop.over{border-color:var(--brand);background:var(--brand-soft)}
 .drop .file{font-size:13px;font-weight:600;word-break:break-word}
@@ -156,28 +155,18 @@ details[open]>summary::before{transform:rotate(45deg)}
       <h2>1 · Load this week's list</h2>
       <button class="ghost small" id="btnTemplates">Get blank templates</button>
     </div>
-    <p class="muted small">Your files are read only on this device and nothing is uploaded. Your list is remembered on this phone until you clear it, so next time it opens ready. A policy listing PDF covers both boxes: load all its pages together.</p>
+    <p class="muted small">Your files are read only on this device and nothing is uploaded. Your list is remembered on this phone until you clear it, so next time it opens ready.</p>
     <div class="drops">
       <div class="drop" id="dropCust">
-        <h3>Customer or policy list</h3>
+        <h3>客户与保单名单 Customer &amp; policy list</h3>
         <p class="small" style="background:var(--brand-soft);border-radius:8px;padding:8px 10px">📥 <b>怎样拿到名单：</b>到 <b>Online Inquiry</b> 下载您所有保单的资料，存成 <b>PDF</b>（所有页），就可以在这里上传了。<br><span class="muted">How to get it: download all your policy data from <b>Online Inquiry</b>, save it as <b>PDF</b> (all pages), then upload it here.</span></p>
-        <p class="small muted">Policy listing PDF, or a customer list with name, birthday, phone, email. Excel, CSV or PDF. You can pick several files.</p>
+        <p class="small muted">生日和保费都从同一份名单读出，一次选全部 PDF 就可以。Birthdays and premiums both come from this one list; pick all the PDF pages at once. Excel or CSV lists also work, even with customers and premiums in separate files.</p>
         <p class="file" id="fileCust">No file loaded</p>
         <div class="row">
-          <label class="btn primary" for="inCust">Choose files</label>
-          <button class="ghost" data-paste="cust">Paste rows</button>
+          <label class="btn primary" for="inCust">选择文件 Choose files</label>
+          <button class="ghost" data-paste="auto">Paste rows</button>
         </div>
         <input type="file" id="inCust" multiple accept=".xlsx,.xls,.csv,.pdf,.png,.jpg,.jpeg,image/*">
-      </div>
-      <div class="drop" id="dropPrem">
-        <h3>Premium list</h3>
-        <p class="small muted">Only needed if premiums are in a separate file: policy no, amount, due date, plus customer ID, phone or name.</p>
-        <p class="file" id="filePrem">No file loaded</p>
-        <div class="row">
-          <label class="btn primary" for="inPrem">Choose files</label>
-          <button class="ghost" data-paste="prem">Paste rows</button>
-        </div>
-        <input type="file" id="inPrem" multiple accept=".xlsx,.xls,.csv,.pdf,.png,.jpg,.jpeg,image/*">
       </div>
     </div>
     <div class="row small" id="savedRow" hidden style="justify-content:space-between;background:var(--ok-soft);border-radius:10px;padding:8px 12px">
@@ -873,10 +862,11 @@ function render(){
   }
   if (S.combined && S.cust) {
     $("#fileCust").textContent = `${S.cust.source} · ${plural(S.cust.body.length, "policy", "policies")} · ${plural(S.customers.length, "customer")}${asAt}`;
-    $("#filePrem").textContent = "Premiums taken from the policy list.";
   } else {
-    $("#fileCust").textContent = S.cust ? `${S.cust.source} · ${plural(S.customers.length, "customer")} read${asAt}` : "No file loaded";
-    $("#filePrem").textContent = S.prem ? `${S.prem.source} · ${plural(S.premiums.length, "unpaid premium")} read` : "No file loaded";
+    const parts = [];
+    if (S.cust) parts.push(`${S.cust.source} · ${plural(S.customers.length, "customer")} read${asAt}`);
+    if (S.prem) parts.push(`${S.prem.source} · ${plural(S.premiums.length, "unpaid premium")} read`);
+    $("#fileCust").textContent = parts.join("  |  ") || "No file loaded";
   }
   renderIssues(); renderMap(); renderList();
   const any = S.week.bday.length + S.week.due.length + S.week.over.length;
@@ -1328,19 +1318,31 @@ async function readFiles(files, slot){
     if (results.every(r => r.image)) return;
   }
   const good = results.filter(r => !r.image);
-  let T = null; const meta = {};
+  const groups = []; const meta = {};
   for (const r of good) {
     const t = tableFrom(r.rows, r.name, r.how);
-    if (!t) { noHeader(r.name, slot); return; }
+    if (!t) { noHeader(r.name); return; }
     Object.assign(meta, r.meta);
-    if (!T) T = t;
-    else if (t.header.length === T.header.length && t.header.every((h, i) => normHead(h) === normHead(T.header[i]))) { T.body.push(...t.body); T.source += " + " + t.source; }
-    else { sheet(`<h2>These files have different columns</h2><p><b>${esc(t.source)}</b> doesn't have the same column headings as <b>${esc(T.source)}</b>. Load them one at a time, or into different boxes.</p><div class="row" style="justify-content:flex-end"><button data-close>OK</button></div>`); return; }
+    const same = groups.find(T => t.header.length === T.header.length && t.header.every((h, i) => normHead(h) === normHead(T.header[i])));
+    if (same) { same.body.push(...t.body); same.source += " + " + t.source; } else groups.push(t);
   }
-  if (T) useTable(T, slot, meta);
+  const kinds = groups.map(autoSlot);
+  if (groups.length > 2 || (groups.length === 2 && kinds[0] === kinds[1])) {
+    sheet(`<h2>These files have different columns</h2><p>${groups.map(T => "<b>" + esc(T.source) + "</b>").join(", ")} don't share the same column headings, so they can't be read together. Load the policy listing PDF pages together, or one customer list plus one premium list.</p><div class="row" style="justify-content:flex-end"><button data-close>OK</button></div>`);
+    return;
+  }
+  /* customers first, so premiums can be matched to them */
+  groups.map((T, i) => [T, kinds[i]]).sort((a, b) => (a[1] === "cust" ? 0 : 1) - (b[1] === "cust" ? 0 : 1))
+    .forEach(([T, k]) => useTable(T, k, meta));
 }
-function noHeader(source, slot){
-  sheet(`<h2>No column headings found</h2><p>We couldn't find headings like <b>${slot === "cust" ? "Name, Birthday, Phone" : "Policy No, Due Date, Amount"}</b> in <b>${esc(source)}</b>.</p><p class="small muted">Make sure the list has a row of column names. The blank templates show the layout.</p><div class="row" style="justify-content:flex-end"><button data-close>OK</button></div>`);
+/* Which list a table is: one with birthdays is the customer (or combined policy) list, one with only due dates is a premium list */
+function autoSlot(T){
+  if (detectMap(T.header, "cust").birthday != null) return "cust";
+  if (detectMap(T.header, "prem").due != null) return "prem";
+  return "cust";
+}
+function noHeader(source){
+  sheet(`<h2>No column headings found</h2><p>We couldn't find headings like <b>Name, Birthday, Policy No, Due Date</b> in <b>${esc(source)}</b>. For the policy listing, download it from Online Inquiry as PDF.</p><p class="small muted">Make sure the list has a row of column names. The blank templates show the layout.</p><div class="row" style="justify-content:flex-end"><button data-close>OK</button></div>`);
 }
 function useTable(T, slot, meta){
   if (S.demo) { S.demo = false; S.cust = null; S.prem = null; S.combined = false; S.meta = {}; S.sent = store.get("sent", {}); }
@@ -1400,13 +1402,11 @@ function bindDrop(zone, input, slot){
   zone.addEventListener("dragleave", () => zone.classList.remove("over"));
   zone.addEventListener("drop", e => { e.preventDefault(); zone.classList.remove("over"); if (e.dataTransfer.files.length) readFiles([...e.dataTransfer.files], slot); });
 }
-bindDrop($("#dropCust"), $("#inCust"), "cust");
-bindDrop($("#dropPrem"), $("#inPrem"), "prem");
+bindDrop($("#dropCust"), $("#inCust"), "auto");
 document.querySelectorAll("[data-paste]").forEach(b => b.addEventListener("click", () => {
-  const slot = b.dataset.paste;
-  sheet(`<h2>Paste ${slot === "cust" ? "customer" : "premium"} rows</h2>
-    <p class="small muted">Copy rows from Excel, Google Sheets, or text copied from a photo. Include the heading row. One customer per line; columns separated by tabs, commas or a | sign.</p>
-    <textarea id="pasteBox" rows="9" aria-label="Rows to paste" placeholder="${slot === "cust" ? "Name	Company	Birthday	Phone	Email	Account Manager" : "Customer ID	Name	Phone	Policy No	Premium Amount	Due Date	Status"}"></textarea>
+  sheet(`<h2>Paste rows</h2>
+    <p class="small muted">Copy rows from Excel, Google Sheets, or text copied from a photo. Include the heading row. One customer or policy per line; columns separated by tabs, commas or a | sign.</p>
+    <textarea id="pasteBox" rows="9" aria-label="Rows to paste" placeholder="Name	Birthday	Phone	Policy No	Premium Amount	Due Date	Status"></textarea>
     <div class="row" style="justify-content:flex-end"><button data-close>Cancel</button><button class="primary" id="pasteGo">Read these rows</button></div>`,
     (el, close) => el.querySelector("#pasteGo").addEventListener("click", () => {
       const text = el.querySelector("#pasteBox").value.trim(); if (!text) return;
@@ -1414,7 +1414,7 @@ document.querySelectorAll("[data-paste]").forEach(b => b.addEventListener("click
       const sep = lines[0].includes("\t") ? /\t/ : lines[0].includes("|") ? /\s*\|\s*/ : lines[0].includes(",") ? /\s*,\s*/ : /\s{2,}/;
       close();
       const T = tableFrom(lines.map(l => l.split(sep)), "Pasted rows", "paste");
-      if (!T) noHeader("the pasted rows", slot); else useTable(T, slot, {});
+      if (!T) noHeader("the pasted rows"); else useTable(T, autoSlot(T), {});
     }));
 }));
 $("#mapArea").addEventListener("change", e => {
