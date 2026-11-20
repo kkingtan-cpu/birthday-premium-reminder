@@ -51,3 +51,4 @@ This file is the project's memory: what was built, why, and what was decided. Ad
 - 2026-11-21: Web page for the team on GitHub Pages (index.html, built from reminder-app.html by build-index.ps1).
 - 2026-11-21: The loaded list is remembered on the phone (browser storage only, never uploaded); Clear saved list button; can be turned off in Settings.
 - 2026-11-21: Installable on Android and iPhone home screens: app icon (calendar, cake and RM coin), manifest, Install app button.
+- 2026-11-21: Install poster with QR code for the team (share/install-poster.png, share/qr-code.png).
